@@ -16,15 +16,15 @@
       "explanation": "El fallo ocurrió porque getByText exige coincidencia exacta del texto visible; al corregir App.tsx para que renderizara exactamente 'CampusOps', el texto volvió a coincidir con lo que la prueba busca, y por eso pasó de nuevo."
     },
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_2",
-      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
-      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
-      "tests": [],
+      "studentId": "3523110572",
+      "commitShas": ["62b30cdd6f6a06e2255f88f14b1dd3b86fb55aef"],
+      "files": ["docs/risk-register.md"],
+      "tests": ["Verificación en PowerShell del conteo de riesgos documentados"],
       "reviews": [],
-      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
-      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
-      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
-      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+      "prediction": "Esperaba encontrar exactamente tres riesgos priorizados en docs/risk-register.md, porque la actividad exige registrar tres riesgos y justificar cuál se atiende primero.",
+      "command": "$rows = (Get-Content -LiteralPath docs\\risk-register.md | Where-Object { $_ -match '^\\| [123] \\|' }).Count\nif ($rows -ne 3) { throw \"Se esperaban 3 riesgos; se encontraron $rows\" }\n\"Riesgos documentados: $rows\"",
+      "observedResult": "El comando mostró 'Riesgos documentados: 3' y no lanzó la excepción, por lo que confirmó que el registro contiene exactamente los tres riesgos requeridos.",
+      "explanation": "El conteo localiza las filas de prioridad 1, 2 y 3 de la tabla. Al obtener tres, confirma que mi cambio en docs/risk-register.md cumple la cantidad exigida; esta comprobación valida la estructura del registro, no sustituye la revisión humana de la calidad de las mitigaciones."
     },
     {
       "studentId": "REEMPLAZAR_INTEGRANTE_3",
