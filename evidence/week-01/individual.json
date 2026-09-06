@@ -2,18 +2,18 @@
   "_instructions": "Eliminen este campo cuando terminen. Conserven exactamente tres integrantes y usen SHA Git completos de commits creados por cada persona.",
   "schemaVersion": 1,
   "week": 1,
-  "teamId": "REEMPLAZAR_CON_ID_DEL_EQUIPO",
+  "teamId": "E06",
   "members": [
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_1",
-      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
-      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
-      "tests": [],
+      "studentId": "3523110444",
+      "commitShas": ["0a8e8974202e23a92904052949bbd1f1022fc8fa"],
+      "files": ["App.tsx", "reports/week-01/baseline.json"],
+      "tests": ["npm run test:smoke"],
       "reviews": [],
-      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
-      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
-      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
-      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+      "prediction": "Esperaba que al cambiar el texto renderizado de 'CampusOps' a 'Campus Ops' en App.tsx, la prueba smoke.test.tsx fallara, porque busca coincidencia exacta de texto mediante getByText('CampusOps').",
+      "command": "npm run test:smoke",
+      "observedResult": "La prueba falló con el mensaje 'Unable to find an element with text: CampusOps'. Tras corregir el texto de vuelta a 'CampusOps', la prueba pasó: 'Tests: 1 passed, 1 total'.",
+      "explanation": "El fallo ocurrió porque getByText exige coincidencia exacta del texto visible; al corregir App.tsx para que renderizara exactamente 'CampusOps', el texto volvió a coincidir con lo que la prueba busca, y por eso pasó de nuevo."
     },
     {
       "studentId": "REEMPLAZAR_INTEGRANTE_2",
