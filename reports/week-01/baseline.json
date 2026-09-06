@@ -6,18 +6,18 @@
   "generatedAt": "REEMPLAZAR_CON_FECHA_HORA_ISO_8601",
   "checks": [
     {
-      "id": "falla-controlada",
+      "id": "falla-texto-campusops",
       "status": "fail",
       "scenarioType": "failure",
       "command": "npm run test:smoke",
-      "evidence": "REEMPLAZAR_CON_SINTOMA_OBSERVADO_Y_CAUSA_IDENTIFICADA"
+      "evidence": "Jest reportó 'Unable to find an element with text: CampusOps' porque App.tsx renderizaba el texto 'Campus Ops' (con espacio) en lugar de 'CampusOps', que es el texto exacto que busca la prueba smoke.test.tsx en la línea 15 mediante getByText('CampusOps')."
     },
     {
       "id": "correccion-verificada",
       "status": "pass",
       "scenarioType": "nominal",
       "command": "npm run test:smoke",
-      "evidence": "REEMPLAZAR_CON_RESULTADO_OBSERVABLE_DESPUES_DE_CORREGIR"
+      "evidence": "Tras corregir App.tsx para que el texto renderizado fuera exactamente 'CampusOps', Jest reportó 'Test Suites: 1 passed, 1 total' y 'Tests: 1 passed, 1 total', confirmando que la causa (discrepancia de texto) quedó resuelta."
     }
   ]
 }
