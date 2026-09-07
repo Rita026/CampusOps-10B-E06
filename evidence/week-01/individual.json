@@ -1,5 +1,4 @@
 {
-  "_instructions": "Eliminen este campo cuando terminen. Conserven exactamente tres integrantes y usen SHA Git completos de commits creados por cada persona.",
   "schemaVersion": 1,
   "week": 1,
   "teamId": "E06",
@@ -27,15 +26,15 @@
       "explanation": "El conteo localiza las filas de prioridad 1, 2 y 3 de la tabla. Al obtener tres, confirma que mi cambio en docs/risk-register.md cumple la cantidad exigida; esta comprobación valida la estructura del registro, no sustituye la revisión humana de la calidad de las mitigaciones."
     },
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_3",
-      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
-      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
-      "tests": [],
+      "studentId": "3523110600",
+      "commitShas": ["74dd31f636bdc52e73b67720aedf4b673f67f62d"],
+      "files": ["docs/problem-definition.md"],
+      "tests": ["Verificación en PowerShell del conteo de criterios de aceptación documentados"],
       "reviews": [],
-      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
-      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
-      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
-      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+      "prediction": "Esperaba encontrar exactamente tres criterios de aceptación verificables en docs/problem-definition.md, porque la definición del problema de CampusOps establece tres escenarios para comprobar la creación, asignación y resolución de incidencias.",
+      "command": "(Select-String -Path \"docs\\problem-definition.md\" -Pattern \"^([123])\\. Dado que\").Count",
+      "observedResult": "El comando mostró 3, confirmando que se encontraron exactamente tres criterios de aceptación documentados.",
+      "explanation": "La verificación cuenta las tres líneas numeradas que comienzan con \"Dado que\" dentro de los criterios de aceptación. Al encontrar tres, confirma que el documento contiene los tres escenarios de aceptación definidos para la creación, asignación y resolución de incidencias."
     }
   ]
 }
