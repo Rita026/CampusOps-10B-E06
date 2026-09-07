@@ -2,19 +2,19 @@
   "_instructions": "Eliminen este campo cuando terminen. Comparen alternativas reales y relacionen la decisión con una comprobación ejecutada.",
   "schemaVersion": 1,
   "week": 1,
-  "commitSha": "REEMPLAZAR_CON_SHA_DEL_COMMIT_DE_CODIGO_Y_DOCUMENTOS",
-  "decision": "REEMPLAZAR_CON_LA_DECISION_DE_ALCANCE_RIESGO_O_ACEPTACION",
+  "commitSha": "0a8e8974202e23a92904052949bbd1f1022fc8fa",
+  "decision": "Priorizamos el riesgo de exposición de datos sensibles o credenciales sobre los otros dos riesgos identificados (conflicto de sincronización y autorización por rol), porque una filtración de datos reales o secretos es difícil de revertir y, según la rúbrica de la actividad, limita la calificación de todo el proyecto si ocurre. Por eso decidimos establecer desde esta semana el uso exclusivo de datos sintéticos y un .gitignore que excluya archivos de configuración y firma, antes de construir cualquier funcionalidad sobre datos reales.",
   "alternatives": [
-    "REEMPLAZAR_CON_PRIMERA_ALTERNATIVA_REAL",
-    "REEMPLAZAR_CON_SEGUNDA_ALTERNATIVA_REAL"
+    "Permitir que cada integrante maneje sus propios datos de prueba sin una regla común, confiando en que nadie suba accidentalmente un secreto o dato real, sin ningún mecanismo de revisión previo al commit.",
+    "Posponer la protección de datos sensibles hasta la semana de sanitización (semana 4), trabajando mientras tanto con configuración de ejemplo sin restricciones específicas en el repositorio."
   ],
-  "tradeoff": "REEMPLAZAR_CON_EL_BENEFICIO_Y_EL_COSTO_DE_LA_DECISION",
+  "tradeoff": "Elegimos establecer la restricción desde ahora (datos sintéticos únicamente, .gitignore estricto) en vez de posponerla. Ganamos que ninguna evidencia de esta o futuras semanas quede expuesta a un secreto real, cumpliendo el requisito de privacidad del caso desde el inicio; aceptamos como costo que el equipo debe revisar conscientemente cada archivo antes de subirlo, en vez de trabajar con total libertad de configuración.",
   "requirementIds": ["AC-02", "AC-04"],
   "verification": [
     {
-      "command": "REEMPLAZAR_CON_COMANDO_EJECUTADO",
-      "result": "REEMPLAZAR_CON_RESULTADO_OBSERVADO",
-      "evidence": "REEMPLAZAR_CON_ARCHIVO_REPORTE_O_SALIDA_QUE_LO_DEMUESTRA"
+      "command": "cat .gitignore",
+      "result": "El archivo excluye node_modules/, .env, *.jks, *.keystore, *.p8, *.p12, dist/, coverage/, .jest-cache/, .expo/, android/ e ios/.",
+      "evidence": "Archivo .gitignore del repositorio, confirmado antes de subir el primer commit del proyecto; ningún archivo .env ni credencial aparece en el historial de commits."
     }
   ]
 }
