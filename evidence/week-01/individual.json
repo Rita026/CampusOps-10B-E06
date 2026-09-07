@@ -6,8 +6,8 @@
   "members": [
     {
       "studentId": "3523110444",
-      "commitShas": ["0a8e8974202e23a92904052949bbd1f1022fc8fa"],
-      "files": ["App.tsx", "reports/week-01/baseline.json"],
+      "commitShas": ["0a8e8974202e23a92904052949bbd1f1022fc8fa", "b75088e65acce23a3a15c124edc3b25fb821a93d"],
+      "files": ["App.tsx", "reports/week-01/baseline.json", "evidence/week-01/engineering.json"],
       "tests": ["npm run test:smoke"],
       "reviews": [],
       "prediction": "Esperaba que al cambiar el texto renderizado de 'CampusOps' a 'Campus Ops' en App.tsx, la prueba smoke.test.tsx fallara, porque busca coincidencia exacta de texto mediante getByText('CampusOps').",
