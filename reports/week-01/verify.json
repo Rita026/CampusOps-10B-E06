@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "week": 1,
+  "mode": "verify",
+  "commitSha": "43cee2213d00508782d4d45bb866c35dccfe9296",
+  "evaluatedAt": "2026-09-07T03:08:40.863239+00:00",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "base_files",
+      "status": "pass",
+      "detail": "missing=[]"
+    },
+    {
+      "id": "react_native_profile",
+      "status": "pass",
+      "detail": "missing packages=[]"
+    },
+    {
+      "id": "toolchain_scripts",
+      "status": "pass",
+      "detail": "missing scripts=[]"
+    },
+    {
+      "id": "workflow_integrity",
+      "status": "pass",
+      "detail": "bypass markers=[]"
+    },
+    {
+      "id": "secret_scan",
+      "status": "pass",
+      "detail": "hits=[]"
+    },
+    {
+      "id": "toolchain_1",
+      "status": "pass",
+      "detail": "npm.cmd run typecheck\n> dmi-react-native-starter@1.0.0 typecheck\n> tsc --noEmit"
+    },
+    {
+      "id": "toolchain_2",
+      "status": "pass",
+      "detail": "npm.cmd run lint\n> dmi-react-native-starter@1.0.0 lint\n> eslint ."
+    },
+    {
+      "id": "toolchain_3",
+      "status": "pass",
+      "detail": "npm.cmd run audit:ci\n> dmi-react-native-starter@1.0.0 audit:ci\n> npm audit --omit=dev --audit-level=critical\n\n# npm audit report\n\n@xmldom/xmldom  <=0.8.14 || 0.9.0 - 0.9.11\nSeverity: moderate\nxmldom: XML fragment injection via invalid EntityReference.nodeName during requireWellFormed serialization - https://github.com/advisories/GHSA-6gmq-8vp8-gcm6\nxmldom: XML fragment injection via invalid EntityReference.nodeName during requireWellFormed serialization - https://github.com/advisories/GHSA-6gmq-8vp8-gcm6\nfix available via `npm audit fix`\nnode_modules/@xmldom/xmldom\nnode_modules/plist/node_modules/@xmldom/xmldom\n\n1 moderate severity vulnerability\n\nTo address all issues, run:\n  npm audit fix"
+    },
+    {
+      "id": "toolchain_4",
+      "status": "pass",
+      "detail": "npm.cmd run test:smoke\n> dmi-react-native-starter@1.0.0 test:smoke\n> jest --no-watchman --cacheDirectory .jest-cache --ci --runInBand course-tests/smoke.test.tsx\n\n\nPASS course-tests/smoke.test.tsx\n  âˆš renders the reproducible baseline and resolves backend state (117 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        1.411 s, estimated 2 s\nRan all test suites matching /course-tests\\\\smoke.test.tsx/i."
+    }
+  ]
+}

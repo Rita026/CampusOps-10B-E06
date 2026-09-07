@@ -1,9 +1,8 @@
 {
-  "_instructions": "Eliminen este campo cuando terminen. Los demás campos deben contener evidencia real y commitSha debe ser un SHA Git completo de 40 caracteres.",
   "schemaVersion": 1,
   "week": 1,
-  "commitSha": "0a8e8974202e23a92904052949bbd1f1022fc8fa",
-  "generatedAt":  "2026-09-06T13:33:00-06:00",
+  "commitSha": "43cee2213d00508782d4d45bb866c35dccfe9296",
+  "generatedAt": "2026-09-06T13:33:00-06:00",
   "checks": [
     {
       "id": "falla-texto-campusops",
