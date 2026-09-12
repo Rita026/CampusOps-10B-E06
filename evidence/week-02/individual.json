@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "week": 2,
+  "teamId": "E06",
+  "members": [
+    {
+      "studentId": "3523110444",
+      "commitShas": ["a68fbe802d36a5fe14ae9cb0a95967857faaeb20"],
+      "files": ["docs/adr/ADR-001-architecture.md", "docs/architecture.mmd"],
+      "tests": ["npx jest --no-watchman course-tests/public/week-02.test.ts"],
+      "reviews": [],
+      "prediction": "Esperaba que la prueba automatica encontrara las palabras ui, application, domain e infrastructure en el diagrama, y que no detectara ninguna flecha directa de ui hacia infrastructure, porque diseñe el diagrama respetando ese limite desde el ADR.",
+      "command": "npx jest --no-watchman course-tests/public/week-02.test.ts",
+      "observedResult": "PASS - Test Suites: 1 passed, 1 total. El test 'architecture exposes boundaries and no direct UI-to-infrastructure edge' paso correctamente en 7 ms, confirmando que docs/architecture.mmd contiene las 4 capas (ui, application, domain, infrastructure) y que no existe ninguna flecha directa de ui hacia infrastructure.",
+      "explanation": "El diagrama y el ADR describen la misma decision (arquitectura por capas), por lo que la prueba automatica que compara ambos archivos contra el patron esperado paso sin necesitar cambios adicionales."
+    },
+    {
+      "studentId": "REEMPLAZAR_INTEGRANTE_2",
+      "commitShas": ["REEMPLAZAR_SHA"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    },
+    {
+      "studentId": "REEMPLAZAR_INTEGRANTE_3",
+      "commitShas": ["REEMPLAZAR_SHA"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    }
+  ]
+}
