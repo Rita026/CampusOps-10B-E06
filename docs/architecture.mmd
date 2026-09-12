@@ -1,0 +1,31 @@
+graph TD
+  subgraph UI["UI (Reportante, Tecnico, Coordinador)"]
+    ScreenList["IncidentListScreen"]
+    ScreenDetail["IncidentDetailScreen"]
+  end
+
+  subgraph Application["Application"]
+    UC1["ListIncidents (caso de uso)"]
+    UC2["GetIncidentDetail (caso de uso)"]
+  end
+
+  subgraph Domain["Domain"]
+    Model["Incident (modelo)"]
+    Contract["IncidentRepository (contrato)"]
+    SessionPort["SessionGateway (previsto, futuras semanas)"]
+    LocationPort["LocationProvider (previsto, futuras semanas)"]
+  end
+
+  subgraph Infrastructure["Infrastructure"]
+    Fake["FakeIncidentRepository (memoria)"]
+    PersistPort["Almacenamiento local (previsto)"]
+    LocationAdapter["Geocodificacion (previsto)"]
+  end
+
+  ScreenList --> UC1
+  ScreenDetail --> UC2
+  UC1 --> Contract
+  UC2 --> Contract
+  Fake -.implementa.-> Contract
+  PersistPort -.implementa.-> SessionPort
+  LocationAdapter -.implementa.-> LocationPort
