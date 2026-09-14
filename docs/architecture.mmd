@@ -5,8 +5,7 @@ graph TD
   end
 
   subgraph Application["Application"]
-    UC1["ListIncidents (caso de uso)"]
-    UC2["GetIncidentDetail (caso de uso)"]
+    Queries["IncidentQueries (casos de uso: list, getById)"]
   end
 
   subgraph Domain["Domain"]
@@ -17,7 +16,7 @@ graph TD
   end
 
   subgraph Infrastructure["Infrastructure"]
-    Fake["FakeIncidentRepository (memoria)"]
+    InMemory["InMemoryIncidentRepository (memoria)"]
     HealthAdapter["CourseBackendHealthGateway"]
     PersistPort["Almacenamiento local (previsto)"]
     LocationAdapter["Geocodificacion (previsto)"]
@@ -27,15 +26,13 @@ graph TD
     Compose["campusOpsServices"]
   end
 
-  ScreenList --> UC1
-  ScreenDetail --> UC2
-  UC1 --> Contract
-  UC2 --> Contract
-  Fake -.implementa.-> Contract
-  Compose --> Fake
+  ScreenList --> Queries
+  ScreenDetail --> Queries
+  Queries --> Contract
+  InMemory -.implementa.-> Contract
+  Compose --> InMemory
   Compose --> HealthAdapter
-  Compose --> UC1
-  Compose --> UC2
+  Compose --> Queries
   Compose --> ScreenList
   Compose --> ScreenDetail
   PersistPort -.implementa.-> SessionPort
