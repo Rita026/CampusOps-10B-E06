@@ -15,15 +15,23 @@
       "explanation": "El diagrama y el ADR describen la misma decision (arquitectura por capas), por lo que la prueba automatica que compara ambos archivos contra el patron esperado paso sin necesitar cambios adicionales."
     },
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_2",
-      "commitShas": ["REEMPLAZAR_SHA"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
+      "studentId": "3523110572",
+      "commitShas": ["09312454c1fea0fe0fe613afbe44b9b897b9a135"],
+      "files": [
+        "src/domain/incidents/Incident.ts",
+        "src/application/incidents/IncidentQueries.ts",
+        "src/infrastructure/incidents/InMemoryIncidentRepository.ts",
+        "src/ui/incidents/IncidentListScreen.tsx",
+        "src/ui/incidents/IncidentDetailScreen.tsx",
+        "src/ui/incidents/IncidentsApp.tsx",
+        "course-tests/incidentQueries.test.ts"
+      ],
+      "tests": ["cmd /c npm.cmd test -- --ci --runInBand course-tests/incidentQueries.test.ts"],
       "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "prediction": "Esperaba que la aplicación listara los tres registros ficticios a través del puerto IncidentRepository, que INC-103 devolviera su detalle y que un identificador inexistente devolviera null, sin que application dependiera de la implementación en memoria.",
+      "command": "cmd /c npm.cmd test -- --ci --runInBand course-tests/incidentQueries.test.ts",
+      "observedResult": "PASS - Test Suites: 1 passed, 1 total; Tests: 2 passed, 2 total. La lista coincidió con fakeIncidents, INC-103 mostró el detalle esperado y INC-999 devolvió null.",
+      "explanation": "Construí el esqueleto de domain, application, infrastructure y ui. IncidentQueries recibe IncidentRepository como interfaz y bootstrap inyecta InMemoryIncidentRepository; por eso las pantallas de lista y detalle pueden conservar sus casos de uso cuando se sustituya el fake por un proveedor HTTP o persistente. También verifiqué el límite UI→infrastructure con un import temporal que el escáner rechazó y retiré esa contradicción."
     },
     {
       "studentId": "REEMPLAZAR_INTEGRANTE_3",

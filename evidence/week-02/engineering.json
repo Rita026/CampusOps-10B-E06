@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "week": 2,
+  "commitSha": "09312454c1fea0fe0fe613afbe44b9b897b9a135",
+  "decision": "Se eligió una arquitectura por capas para el esqueleto de incidencias: los modelos y puertos están en domain, los casos de uso de consulta en application, los adaptadores concretos en infrastructure y las pantallas en ui. Un composition root en bootstrap es el único lugar que selecciona InMemoryIncidentRepository y el adaptador de estado del backend.",
+  "alternatives": [
+    "Organizar cada pantalla como un vertical slice que importe su propio acceso a datos. Es rápido al iniciar, pero lista y detalle duplicarían el contrato y cada cambio de proveedor alcanzaría a la UI.",
+    "Usar arquitectura por capas con un puerto IncidentRepository. La UI recibe IncidentQueries y no conoce el fake; un adaptador HTTP o de persistencia puede reemplazar al de memoria.",
+    "Dejar datos ficticios como constantes importadas directamente por las pantallas. Reduce archivos al inicio, pero impide probar los casos de uso y acopla la presentación a un origen específico."
+  ],
+  "tradeoff": "La elección agrega el puerto, casos de uso y composition root, por lo que hay más archivos y una inyección explícita para sólo dos pantallas. A cambio, la lista y el detalle se prueban con datos deterministas y cambiar de memoria a HTTP, almacenamiento local o un proveedor futuro no obliga a modificar src/ui/.",
+  "requirementIds": ["AC-01", "AC-02", "AC-03", "AC-04", "AC-05"],
+  "verification": [
+    {
+      "command": "cmd /c npm.cmd test -- --ci --runInBand course-tests/incidentQueries.test.ts",
+      "result": "PASS: 1 suite y 2 pruebas; se listaron los datos ficticios y se distinguió el detalle existente de INC-103 del identificador inexistente INC-999.",
+      "evidence": "course-tests/incidentQueries.test.ts prueba createIncidentQueries contra InMemoryIncidentRepository mediante el contrato IncidentRepository."
+    },
+    {
+      "command": "$violations = @(Get-ChildItem -LiteralPath src/ui -Recurse -File | Where-Object { $_.Extension -in '.ts', '.tsx' } | Select-String -Pattern 'from\\s+[''\"][^''\"]*infrastructure'); if ($violations.Count -gt 0) { $violations | ForEach-Object { \"$($_.Path):$($_.LineNumber):$($_.Line.Trim())\" }; exit 1 }; 'UI no importa infrastructure.'",
+      "result": "El ensayo con un import temporal falló y señaló src/ui/incidents/IncidentsApp.tsx:6; luego de retirarlo, el mismo comando mostró 'UI no importa infrastructure.' y terminó con código 0.",
+      "evidence": "reports/week-02/dependencies.json conserva ambas observaciones y docs/adr/ADR-001-architecture.md explica la causa, el efecto y la corrección."
+    },
+    {
+      "command": "cmd /c npm.cmd run typecheck; cmd /c npm.cmd run lint; cmd /c npm.cmd run test:smoke",
+      "result": "Los tres comandos terminaron con código 0; la prueba smoke conservó el estado visible Backend: available.",
+      "evidence": "App.tsx usa campusOpsServices como composition root y src/ui/CampusOpsApp.tsx conserva la línea base sin importar infraestructura directamente."
+    }
+  ]
+}
