@@ -34,15 +34,17 @@
       "explanation": "Construí el esqueleto de domain, application, infrastructure y ui. IncidentQueries recibe IncidentRepository como interfaz y bootstrap inyecta InMemoryIncidentRepository; por eso las pantallas de lista y detalle pueden conservar sus casos de uso cuando se sustituya el fake por un proveedor HTTP o persistente. También verifiqué el límite UI→infrastructure con un import temporal que el escáner rechazó y retiré esa contradicción."
     },
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_3",
-      "commitShas": ["REEMPLAZAR_SHA"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
+      "studentId": "3523110600",
+      "commitShas": ["882bda84688ba5cba01905e6457236cf04add8cf"],
+      "files": [
+        "reports/week-02/dependencies.json", 
+        "evidence/week-02/individual.json" ],
+      "tests": ["cmd /c npm.cmd test -- --ci --runInBand course-tests/incidentQueries.test.ts", "cmd /c npm.cmd run typecheck", "cmd /c npm.cmd run lint" ],
       "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "prediction": "Esperaba que un import temporal de InMemoryIncidentRepository dentro de la UI fuera detectado como una violacion porque el ADR establece que UI no debe depender directamente de infrastructure.",
+      "command": "$violations = @(Get-ChildItem -LiteralPath src/ui -Recurse -File | Where-Object { $_.Extension -in '.ts', '.tsx' } | Select-String -Pattern 'from\\s+[''\"][^''\"]*infrastructure'); if ($violations.Count -gt 0) { $violations | ForEach-Object { \"$($_.Path):$($_.LineNumber):$($_.Line.Trim())\" }; exit 1 }; 'UI no importa infrastructure.'",
+      "observedResult": "Con el import temporal el detector termino con codigo 1, identificando src/ui/incidents/IncidentsApp.tsx como dependencia UI -> infrastructure. Despues de retirar el import, el mismo detector mostro 'UI no importa infrastructure.'. Las pruebas de incidentQueries terminaron PASS con 2 pruebas, y typecheck y lint terminaron sin errores.",
+      "explanation": "Provoque de forma controlada la contradiccion entre el ADR y los imports reales para comprobar que la frontera arquitectonica podia detectarse. La dependencia temporal acoplaba IncidentsApp con InMemoryIncidentRepository, pero la solucion correcta mantiene la seleccion del proveedor en src/bootstrap/campusOpsServices.ts y entrega a la UI solamente IncidentQueries. La violacion fue retirada antes del estado entregable y el repositorio quedo limpio."
     }
   ]
 }

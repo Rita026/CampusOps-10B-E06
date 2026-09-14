@@ -1,36 +1,36 @@
 {
   "schemaVersion": 1,
   "week": 2,
-  "commitSha": "09312454c1fea0fe0fe613afbe44b9b897b9a135",
-  "generatedAt": "2026-09-13T19:10:30-06:00",
+  "commitSha": "baa9e8731ce55f32c5c47298bfbd260ea15b0d86",
+  "generatedAt": "2026-09-13T23:47:28-06:00",
   "checks": [
     {
       "id": "incident-queries-through-port",
       "status": "pass",
       "scenarioType": "nominal",
       "command": "cmd /c npm.cmd test -- --ci --runInBand course-tests/incidentQueries.test.ts",
-      "evidence": "PASS: 2 pruebas. El caso de uso lista los tres datos ficticios de InMemoryIncidentRepository y obtiene INC-103; para INC-999 devuelve null. La aplicación usa IncidentRepository, no la clase concreta."
+      "evidence": "PASS: 2 pruebas. El caso de uso lista los tres datos ficticios de InMemoryIncidentRepository y obtiene INC-103; para INC-999 devuelve null. La aplicacion usa IncidentRepository, no la clase concreta."
     },
     {
-      "id": "ui-to-infrastructure-import",
+      "id": "ui-to-infrastructure-import-failure",
       "status": "fail",
       "scenarioType": "failure",
       "command": "$violations = @(Get-ChildItem -LiteralPath src/ui -Recurse -File | Where-Object { $_.Extension -in '.ts', '.tsx' } | Select-String -Pattern 'from\\s+[''\"][^''\"]*infrastructure'); if ($violations.Count -gt 0) { $violations | ForEach-Object { \"$($_.Path):$($_.LineNumber):$($_.Line.Trim())\" }; exit 1 }; 'UI no importa infrastructure.'",
-      "evidence": "Con el import temporal de InMemoryIncidentRepository en src/ui/incidents/IncidentsApp.tsx, el comando terminó con código 1 e indicó la línea 6. La UI quedaba acoplada a un proveedor concreto, contradiciendo el ADR."
+      "evidence": "Con el import temporal de InMemoryIncidentRepository en src/ui/incidents/IncidentsApp.tsx, el detector termino con codigo 1. El import temporal estaba en la linea 8 y creaba una dependencia directa UI -> infrastructure, contradiciendo el ADR."
     },
     {
-      "id": "ui-to-infrastructure-import",
+      "id": "ui-to-infrastructure-import-restored",
       "status": "pass",
       "scenarioType": "boundary",
       "command": "$violations = @(Get-ChildItem -LiteralPath src/ui -Recurse -File | Where-Object { $_.Extension -in '.ts', '.tsx' } | Select-String -Pattern 'from\\s+[''\"][^''\"]*infrastructure'); if ($violations.Count -gt 0) { $violations | ForEach-Object { \"$($_.Path):$($_.LineNumber):$($_.Line.Trim())\" }; exit 1 }; 'UI no importa infrastructure.'",
-      "evidence": "Después de retirar el import temporal, el mismo comando mostró 'UI no importa infrastructure.' y terminó correctamente. La selección de InMemoryIncidentRepository quedó exclusivamente en src/bootstrap/campusOpsServices.ts."
+      "evidence": "Despues de retirar el import temporal, el mismo comando mostro 'UI no importa infrastructure.' y termino correctamente. La seleccion de InMemoryIncidentRepository quedo exclusivamente en src/bootstrap/campusOpsServices.ts."
     },
     {
       "id": "typescript-and-lint",
       "status": "pass",
       "scenarioType": "nominal",
       "command": "cmd /c npm.cmd run typecheck; cmd /c npm.cmd run lint",
-      "evidence": "Ambos comandos terminaron con código 0 después de ajustar la carga inicial de la lista y del detalle para que sea cancelable."
+      "evidence": "Ambos comandos terminaron correctamente; typecheck no mostro errores y lint no mostro errores."
     }
   ]
 }
