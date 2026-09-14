@@ -18,8 +18,13 @@ graph TD
 
   subgraph Infrastructure["Infrastructure"]
     Fake["FakeIncidentRepository (memoria)"]
+    HealthAdapter["CourseBackendHealthGateway"]
     PersistPort["Almacenamiento local (previsto)"]
     LocationAdapter["Geocodificacion (previsto)"]
+  end
+
+  subgraph Bootstrap["Composition root (bootstrap)"]
+    Compose["campusOpsServices"]
   end
 
   ScreenList --> UC1
@@ -27,5 +32,11 @@ graph TD
   UC1 --> Contract
   UC2 --> Contract
   Fake -.implementa.-> Contract
+  Compose --> Fake
+  Compose --> HealthAdapter
+  Compose --> UC1
+  Compose --> UC2
+  Compose --> ScreenList
+  Compose --> ScreenDetail
   PersistPort -.implementa.-> SessionPort
   LocationAdapter -.implementa.-> LocationPort

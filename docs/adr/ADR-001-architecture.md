@@ -40,3 +40,8 @@ La Alternativa B habría facilitado el trabajo en paralelo de features aisladas,
 - La UI (`src/ui/`) no debe importar nada de `src/infrastructure/` directamente.
 - `src/application/` solo depende del contrato definido en `src/domain/`, nunca de una clase concreta de infraestructura.
 - `src/infrastructure/` implementa el contrato de `src/domain/`, pero `src/domain/` nunca importa nada de infraestructura.
+- `src/bootstrap/` es el *composition root*: selecciona `InMemoryIncidentRepository` y los adaptadores concretos, los inyecta en los casos de uso y no contiene pantallas.
+
+## Contraste y corrección de dependencias (AC-03)
+
+Como comprobación controlada se añadió de forma temporal un `import type` de `InMemoryIncidentRepository` dentro de `src/ui/IncidentsApp.tsx`. El escáner de imports lo detectó como una dependencia prohibida de UI hacia infraestructura. Aunque fuera un import de tipos, la pantalla quedaba acoplada al fake concreto y cambiarlo por HTTP o persistencia obligaría a modificar la UI. Se retiró ese import: `IncidentsApp` ahora recibe sólo `IncidentQueries` desde `application`, y `src/bootstrap/campusOpsServices.ts` conserva la elección de `InMemoryIncidentRepository`. La comprobación posterior no encontró importaciones de `infrastructure` dentro de `src/ui/`.
