@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 2,
-  "commitSha": "baa9e8731ce55f32c5c47298bfbd260ea15b0d86",
+  "commitSha": "e3447c6b105a30da1d08bfd9830118fe8aabfca1",
   "decision": "Se eligiÃ³ una arquitectura por capas para el esqueleto de incidencias: los modelos y puertos estÃ¡n en domain, los casos de uso de consulta en application, los adaptadores concretos en infrastructure y las pantallas en ui. Un composition root en bootstrap es el Ãºnico lugar que selecciona InMemoryIncidentRepository y el adaptador de estado del backend.",
   "alternatives": [
     "Organizar cada pantalla como un vertical slice que importe su propio acceso a datos. Es rÃ¡pido al iniciar, pero lista y detalle duplicarÃ­an el contrato y cada cambio de proveedor alcanzarÃ­a a la UI.",
