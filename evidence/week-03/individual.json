@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "week": 3,
+  "teamId": "E06",
+  "members": [
+    {  
+      "studentId": "3523110444",
+      "commitShas": ["945933092bf6c77473e0de6fc3ad755d770ee7c5"],
+      "files": ["docs/threat-model.md", ".github/workflows/week-03-ci-amenazas-feedback.yml", "docs/assignments/week-03.md"],
+      "tests": ["npx jest --no-watchman course-tests/public/week-03.test.ts"],
+      "reviews": ["Revisé la ejecución de Week 03 Academic Feedback en GitHub Actions: typecheck, lint, audit:ci y las pruebas públicas de week-03.test.ts pasaron correctamente; el workflow falló únicamente por required_evidence, ya que en ese momento reports/week-03/security.json, evidence/week-03/engineering.json y evidence/week-03/individual.json aún estaban vacíos, pendientes de que el equipo completara su contenido."],
+      "prediction": "Esperaba que docs/threat-model.md pasara la prueba automática que exige las palabras activo, amenaza, control y verificación, y que el workflow ejecutara sin errores de sintaxis YAML.",
+      "command": "npx jest --no-watchman course-tests/public/week-03.test.ts",
+      "observedResult": "PASS - Test Suites: 1 passed, 1 total; Tests: 2 passed, 2 total. Los tests 'feedback workflow preserves critical checks and least privilege' y 'threat model links assets, threats, controls and verification' pasaron correctamente.",
+      "explanation": "El workflow week-03-ci-amenazas-feedback.yml conserva las comprobaciones críticas y permisos mínimos que exige la primera prueba, y docs/threat-model.md contiene las palabras activo, amenaza, control y verificación con la estructura que exige la segunda prueba."
+      },
+    {
+      "studentId": "REEMPLAZAR_INTEGRANTE_1",
+      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
+      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
+      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
+      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
+      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+    },
+    {
+      "studentId": "REEMPLAZAR_INTEGRANTE_1",
+      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
+      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
+      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
+      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
+      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+    }
+  ]
+}
