@@ -15,15 +15,18 @@
       "explanation": "El workflow week-03-ci-amenazas-feedback.yml conserva las comprobaciones críticas y permisos mínimos que exige la primera prueba, y docs/threat-model.md contiene las palabras activo, amenaza, control y verificación con la estructura que exige la segunda prueba."
       },
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_1",
-      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
-      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
-      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
-      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
-      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+      "studentId": "3523110572",
+      "commitShas": ["5a28f58aba434eec37a57f6e416342eacd1ca54b"],
+      "files": ["docs/threat-model.md", "evidence/week-03/individual.json"],
+      "tests": ["git diff --check"],
+      "reviews": [
+        "Con apoyo de IA revisé el modelo de amenazas y lo vinculé con los controles reales de course-backend/campusops.mjs y con comandos reproducibles, sin guardar secretos ni datos reales.",
+        "Para que Week 03 Academic Feedback quede en verde faltan reports/week-03/security.json y evidence/week-03/engineering.json válidos, tres registros individuales con matrícula única y SHA completo, y una ejecución posterior en GitHub Actions. El workflow ya conserva el artefacto academic-evidence-week-03-ci-amenazas, pero su última ejecución remota terminó en Failure por evidencias incompletas."
+      ],
+      "prediction": "Esperaba que la revisión no encontrara errores de espacios y que el modelo relacionara cada amenaza con un control del backend o con un control explícitamente pendiente, además de una comprobación reproducible.",
+      "command": "git diff --check",
+      "observedResult": "El comando terminó correctamente y no reportó errores de espacios. Git únicamente advirtió que el archivo threat-model.md cambiará de LF a CRLF cuando vuelva a tocarse en Windows; no es un error de contenido ni bloquea la comprobación.",
+      "explanation": "Actualicé el modelo para evitar controles afirmados sin respaldo: las consultas y acciones no autorizadas se prueban con npm run backend:self-test, la política de logs queda declarada como pendiente hasta tener un emisor de registros y el escaneo de secretos debe demostrar un fallo controlado seguido de una corrección. Mi aporte técnico quedó registrado en el SHA 5a28f58aba434eec37a57f6e416342eacd1ca54b."
     },
     {
       "studentId": "REEMPLAZAR_INTEGRANTE_1",
