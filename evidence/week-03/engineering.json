@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 3,
-  "commitSha": "e77ccdf56891d694e2537374e19552459d9d7904",
+  "commitSha": "be6d203804b9aa35ed19376d3eadc7c9a19c25ab",
   "decision": "Atender primero la amenaza de consultar incidencias ajenas mediante autorización en el backend, porque una consulta no autorizada puede exponer datos de otros perfiles y la regla centralizada evita depender de filtros de la interfaz.",
   "alternatives": [
     "Filtrar las incidencias únicamente desde la interfaz para ocultar los registros que el usuario no debería observar.",
