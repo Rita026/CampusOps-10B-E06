@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "week": 3,
+  "commitSha": "37bb62dc3f04e2ca4f3b8f5e330363436770a282",
+  "generatedAt": "2026-09-20T22:19:01.950243+00:00",
+  "checks": [
+    {
+      "id": "secret-scan-initial",
+      "status": "pass",
+      "scenarioType": "nominal",
+      "command": "python tools/course_public_evaluator.py --week 3 --mode verify",
+      "evidence": "La comprobación inicial terminó en PASS y secret_scan reportó hits=[] en el SHA 37bb62dc3f04e2ca4f3b8f5e330363436770a282."
+    },
+    {
+      "id": "secret-scan-detected-failure",
+      "status": "fail",
+      "scenarioType": "failure",
+      "command": "python tools/course_public_evaluator.py --week 3 --mode verify",
+      "evidence": "La comprobación terminó en FAIL porque secret_scan detectó week-03-secret-test.txt:aws_access_key al introducir temporalmente un patrón ficticio de clave AWS."
+    },
+    {
+      "id": "secret-scan-corrected",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "python tools/course_public_evaluator.py --week 3 --mode verify",
+      "evidence": "Después de eliminar week-03-secret-test.txt, la comprobación volvió a PASS y secret_scan reportó hits=[]."
+    }
+  ]
+}
