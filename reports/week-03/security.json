@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 3,
-  "commitSha": "37bb62dc3f04e2ca4f3b8f5e330363436770a282",
+  "commitSha": "e77ccdf56891d694e2537374e19552459d9d7904",
   "generatedAt": "2026-09-20T22:19:01.950243+00:00",
   "checks": [
     {
@@ -9,7 +9,7 @@
       "status": "pass",
       "scenarioType": "nominal",
       "command": "python tools/course_public_evaluator.py --week 3 --mode verify",
-      "evidence": "La comprobación inicial terminó en PASS y secret_scan reportó hits=[] en el SHA 37bb62dc3f04e2ca4f3b8f5e330363436770a282."
+      "evidence": "La comprobación inicial terminó en PASS y secret_scan reportó hits=[] en el SHA e77ccdf56891d694e2537374e19552459d9d7904."
     },
     {
       "id": "secret-scan-detected-failure",

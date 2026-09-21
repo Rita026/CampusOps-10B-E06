@@ -29,15 +29,16 @@
       "explanation": "Actualicé el modelo para evitar controles afirmados sin respaldo: las consultas y acciones no autorizadas se prueban con npm run backend:self-test, la política de logs queda declarada como pendiente hasta tener un emisor de registros y el escaneo de secretos debe demostrar un fallo controlado seguido de una corrección. Mi aporte técnico quedó registrado en el SHA 5a28f58aba434eec37a57f6e416342eacd1ca54b."
     },
     {
-      "studentId": "REEMPLAZAR_INTEGRANTE_1",
-      "commitShas": ["REEMPLAZAR_CON_SHA_COMPLETO"],
-      "files": ["REEMPLAZAR_CON_ARCHIVO_TRABAJADO"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR_CON_LO_QUE_ESPERABA_OBSERVAR",
-      "command": "REEMPLAZAR_CON_EL_COMANDO_EJECUTADO",
-      "observedResult": "REEMPLAZAR_CON_LO_QUE_OCURRIO",
-      "explanation": "REEMPLAZAR_CON_LA_EXPLICACION_TECNICA"
+      "studentId": "3523110600",
+      "commitShas": ["e77ccdf56891d694e2537374e19552459d9d7904"],
+      "files": ["reports/week-03/security.json",
+                "evidence/week-03/engineering.json"],
+      "tests": ["python tools/course_public_evaluator.py --week 3 --mode verify"],
+      "reviews": ["Verificación del fallo controlado del secret_scan y posterior recuperación a PASS."],
+      "prediction": "Esperaba que el evaluador detectara el patrón ficticio de secreto durante la prueba controlada y que volviera a PASS después de eliminar el archivo temporal.",
+      "command": "python tools/course_public_evaluator.py --week 3 --mode verify",
+      "observedResult": "El evaluador pasó inicialmente, falló al detectar week-03-secret-test.txt:aws_access_key y volvió a PASS después de eliminar el archivo temporal.",
+      "explanation": "La prueba demuestra que el control de secret_scan no está ocultando fallos: detecta un patrón ficticio de credencial, genera evidencia del fallo y recupera el estado PASS al corregir la condición."
     }
   ]
 }

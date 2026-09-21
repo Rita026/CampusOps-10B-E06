@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "week": 3,
+  "mode": "public",
+  "commitSha": "7b8cd1f0fa5db3a9ba3073f18414fd50e396b18c",
+  "evaluatedAt": "2026-09-21T02:53:52.362858+00:00",
+  "status": "fail",
+  "checks": [
+    {
+      "id": "base_files",
+      "status": "pass",
+      "detail": "missing=[]"
+    },
+    {
+      "id": "react_native_profile",
+      "status": "pass",
+      "detail": "missing packages=[]"
+    },
+    {
+      "id": "toolchain_scripts",
+      "status": "pass",
+      "detail": "missing scripts=[]"
+    },
+    {
+      "id": "workflow_integrity",
+      "status": "pass",
+      "detail": "bypass markers=[]"
+    },
+    {
+      "id": "secret_scan",
+      "status": "pass",
+      "detail": "hits=[]"
+    },
+    {
+      "id": "required_evidence",
+      "status": "pass",
+      "detail": "missing/empty=[]"
+    },
+    {
+      "id": "schema:reports/week-03/security.json",
+      "status": "fail",
+      "detail": "commitSha must be HEAD or its direct evidence-only parent"
+    },
+    {
+      "id": "schema:evidence/week-03/engineering.json",
+      "status": "fail",
+      "detail": "commitSha must be HEAD or its direct evidence-only parent"
+    },
+    {
+      "id": "schema:evidence/week-03/individual.json",
+      "status": "pass",
+      "detail": "three individual evidence records found"
+    },
+    {
+      "id": "toolchain_1",
+      "status": "fail",
+      "detail": "npm run typecheck\n[WinError 2] El sistema no puede encontrar el archivo especificado"
+    },
+    {
+      "id": "toolchain_2",
+      "status": "fail",
+      "detail": "npm run lint\n[WinError 2] El sistema no puede encontrar el archivo especificado"
+    },
+    {
+      "id": "toolchain_3",
+      "status": "fail",
+      "detail": "npm run audit:ci\n[WinError 2] El sistema no puede encontrar el archivo especificado"
+    },
+    {
+      "id": "toolchain_4",
+      "status": "fail",
+      "detail": "npm test -- --ci --runInBand course-tests/public/week-03.test.ts\n[WinError 2] El sistema no puede encontrar el archivo especificado"
+    }
+  ]
+}
