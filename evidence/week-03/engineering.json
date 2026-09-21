@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "week": 3,
+  "commitSha": "e77ccdf56891d694e2537374e19552459d9d7904",
+  "decision": "Atender primero la amenaza de consultar incidencias ajenas mediante autorización en el backend, porque una consulta no autorizada puede exponer datos de otros perfiles y la regla centralizada evita depender de filtros de la interfaz.",
+  "alternatives": [
+    "Filtrar las incidencias únicamente desde la interfaz para ocultar los registros que el usuario no debería observar.",
+    "Mantener la autorización en el backend mediante reglas de visibilidad asociadas al actor y su rol."
+  ],
+  "tradeoff": "La autorización en el backend requiere mantener reglas de visibilidad y probar distintos roles, pero reduce el riesgo de exposición porque la restricción se aplica antes de entregar los datos y no depende de que la interfaz los oculte correctamente.",
+  "requirementIds": [
+    "AC-01",
+    "AC-02",
+    "AC-03",
+    "AC-04"
+  ],
+  "verification": [
+    {
+      "command": "npm run backend:self-test",
+      "result": "PASS",
+      "evidence": "El self-test controlado del backend terminó correctamente y reportó PASS para los contratos de roles, reasignación, respuesta perdida, idempotencia, evidencia y geocodificación."
+    },
+    {
+      "command": "python tools/course_public_evaluator.py --week 3 --mode verify",
+      "result": "PASS después de corregir el fallo controlado",
+      "evidence": "El evaluador terminó en PASS y secret_scan reportó hits=[] después de eliminar el archivo temporal utilizado para demostrar la detección de un patrón ficticio de secreto."
+    }
+  ]
+}
