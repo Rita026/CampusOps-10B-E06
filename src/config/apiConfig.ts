@@ -1,0 +1,1 @@
+export const DEMO_API_KEY = import.meta.env.VITE_DEMO_API_KEY;
