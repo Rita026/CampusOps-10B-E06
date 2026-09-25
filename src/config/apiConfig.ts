@@ -1,1 +1,1 @@
-export const DEMO_API_KEY = import.meta.env.VITE_DEMO_API_KEY;
+export const DEMO_API_KEY = process.env.EXPO_PUBLIC_DEMO_API_KEY;
