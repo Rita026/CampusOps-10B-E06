@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "week": 4,
+  "teamId": "E06",
+  "members": [
+    {
+      "studentId": "3523110444",
+      "commitShas": ["0d43587a883870b9d57ca3bdce7dcbb39d1e9840"],
+      "files": [
+        "src/course-evaluation/index.ts",
+        "src/infrastructure/telemetry/logTelemetry.ts",
+        "src/api/courseBackend.ts",
+        "docs/security-controls.md"
+      ],
+      "tests": [
+        "npx jest --no-watchman course-tests/public/week-04.test.ts",
+        "npm run test:smoke",
+        "npm run typecheck"
+      ],
+      "reviews": [],
+      "prediction": "Esperaba que redactForTelemetry ocultara recursivamente los campos sensibles definidos en docs/CAMPUSOPS_API.md sin alterar la entrada original, y que al conectarla con courseBackend.ts, cualquier dato de diagnóstico en los caminos de error también quedara sanitizado antes de registrarse.",
+      "command": "npx jest --no-watchman course-tests/public/week-04.test.ts",
+      "observedResult": "PASS - Test Suites: 1 passed, 1 total; Tests: 1 passed, 1 total. El test 'CampusOps redacts personal and incident-sensitive data while preserving technical context' pasó correctamente en 14 ms.",
+      "explanation": "redactForTelemetry recorre objetos y listas anidadas comparando cada clave normalizada contra el conjunto de campos sensibles del contrato de CAMPUSOPS_API.md, reemplazando su valor por '[REDACTED]' sin mutar la entrada original; por eso el resultado coincidió exactamente con lo esperado por la prueba pública."
+    },
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    },
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    }
+  ]
+}
