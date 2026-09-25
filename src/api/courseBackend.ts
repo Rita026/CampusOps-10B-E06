@@ -1,3 +1,5 @@
+import { logTelemetry } from '../infrastructure/telemetry/logTelemetry';
+
 export type BackendHealth = Readonly<{
   ok: true;
   service: 'dmi-controlled-backend';
@@ -11,6 +13,7 @@ export async function getBackendHealth(
 ): Promise<BackendHealth> {
   const response = await fetch(`${baseUrl}/health`);
   if (!response.ok) {
+    logTelemetry('backend_health_failed', { status: response.status });
     throw new Error(`Backend health failed with ${response.status}`);
   }
   const payload: unknown = await response.json();
@@ -22,6 +25,7 @@ export async function getBackendHealth(
     !('contractVersion' in payload) ||
     payload.contractVersion !== 1
   ) {
+    logTelemetry('backend_health_contract_mismatch', { payload });
     throw new Error('Backend health contract mismatch');
   }
   return payload as BackendHealth;
