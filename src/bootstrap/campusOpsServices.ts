@@ -1,6 +1,7 @@
 import { createIncidentQueries } from '../application/incidents/IncidentQueries';
 import { createBackendHealthCheck } from '../application/system/checkBackendHealth';
 import { InMemoryIncidentRepository } from '../infrastructure/incidents/InMemoryIncidentRepository';
+import { SecureSessionCredentialStore } from '../infrastructure/session/SecureSessionCredentialStore';
 import { CourseBackendHealthGateway } from '../infrastructure/system/CourseBackendHealthGateway';
 
 /**
@@ -10,4 +11,5 @@ import { CourseBackendHealthGateway } from '../infrastructure/system/CourseBacke
 export const campusOpsServices = {
   incidentQueries: createIncidentQueries(new InMemoryIncidentRepository()),
   checkBackendHealth: createBackendHealthCheck(new CourseBackendHealthGateway()),
+  sessionCredentials: new SecureSessionCredentialStore(),
 } as const;
