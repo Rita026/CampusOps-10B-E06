@@ -24,15 +24,27 @@
       "explanation": "redactForTelemetry recorre objetos y listas anidadas comparando cada clave normalizada contra el conjunto de campos sensibles del contrato de CAMPUSOPS_API.md, reemplazando su valor por '[REDACTED]' sin mutar la entrada original; por eso el resultado coincidió exactamente con lo esperado por la prueba pública."
     },
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110572",
+      "commitShas": ["0d25f94b8ca1c7909326ff49d3c9ce0fee95250f"],
+      "files": [
+        "src/infrastructure/session/SecureSessionCredentialStore.ts",
+        "src/domain/session/SessionCredentialStore.ts",
+        "src/api/courseBackend.ts",
+        "course-tests/security-storage-errors.test.ts",
+        "docs/security-controls.md"
+      ],
+      "tests": [
+        "npx.cmd jest --no-watchman --cacheDirectory .jest-cache --ci --runInBand course-tests/security-storage-errors.test.ts course-tests/public/week-04.test.ts",
+        "npm.cmd run typecheck",
+        "npm.cmd run lint"
+      ],
+      "reviews": [
+        "Con apoyo de IA revisé el alcance de Semana 04, las rutas de datos sensibles y los errores de /health; contrasté la propuesta con el contrato del curso y verifiqué personalmente el código y las pruebas ejecutadas."
+      ],
+      "prediction": "Esperaba que las credenciales se guardaran, recuperaran y borraran mediante SecureStore sin persistir datos adicionales; ante fallas nativas o respuestas remotas malformadas, los errores y logs no debían incluir marcadores sensibles.",
+      "command": "npx.cmd jest --no-watchman --cacheDirectory .jest-cache --ci --runInBand course-tests/security-storage-errors.test.ts course-tests/public/week-04.test.ts",
+      "observedResult": "PASS: 2 suites y 12 pruebas. Pasaron roundtrip y borrado, datos extra descartados, entrada dañada, almacén no disponible, fallas nativas de save/load/clear, errores HTTP/red/JSON/contrato y la prueba pública de sanitización. npm.cmd run typecheck y npm.cmd run lint terminaron sin errores.",
+      "explanation": "Implementé un puerto de sesión y un adaptador de expo-secure-store que persiste sólo accessToken y refreshToken, elimina entradas corruptas y falla sin usar preferencias planas. En getBackendHealth limité la telemetría a eventos y estado/fase técnicos y unifiqué los mensajes públicos, para que cuerpos remotos y excepciones no expongan información interna. La app aún no realiza login; el adaptador queda integrado en campusOpsServices y probado directamente."
     },
     {
       "studentId": "REEMPLAZAR",
