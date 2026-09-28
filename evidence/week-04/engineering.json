@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 4,
-  "commitSha": "75bed4f79efa3c105c0d40745a4d97a025a58cd5",
+  "commitSha": "dfa7e430cc25cbeb71e9e3a46f8b8bcce09af514",
   "decision": "Protegimos la información sensible con tres controles que se complementan y que ya están en el código: (1) toda la telemetría pasa por logTelemetry, que llama a redactForTelemetry para ocultar recursivamente los campos del contrato de docs/CAMPUSOPS_API.md sin modificar la entrada; (2) getBackendHealth devuelve un mensaje público fijo y registra sólo un evento y un estado HTTP acotado, nunca el cuerpo remoto ni el texto de excepciones; (3) las credenciales de sesión se guardan únicamente mediante SecureSessionCredentialStore sobre expo-secure-store, que persiste sólo accessToken y refreshToken y no usa almacenamiento plano como respaldo.",
   "alternatives": [
     "Guardar los tokens en AsyncStorage, preferencias comunes o variables EXPO_PUBLIC_*. Es más simple de implementar, pero los datos quedan legibles sin cifrado en el dispositivo y las variables públicas terminan dentro del paquete de la app.",
