@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "week": 4,
+  "commitSha": "75bed4f79efa3c105c0d40745a4d97a025a58cd5",
+  "decision": "Protegimos la información sensible con tres controles que se complementan y que ya están en el código: (1) toda la telemetría pasa por logTelemetry, que llama a redactForTelemetry para ocultar recursivamente los campos del contrato de docs/CAMPUSOPS_API.md sin modificar la entrada; (2) getBackendHealth devuelve un mensaje público fijo y registra sólo un evento y un estado HTTP acotado, nunca el cuerpo remoto ni el texto de excepciones; (3) las credenciales de sesión se guardan únicamente mediante SecureSessionCredentialStore sobre expo-secure-store, que persiste sólo accessToken y refreshToken y no usa almacenamiento plano como respaldo.",
+  "alternatives": [
+    "Guardar los tokens en AsyncStorage, preferencias comunes o variables EXPO_PUBLIC_*. Es más simple de implementar, pero los datos quedan legibles sin cifrado en el dispositivo y las variables públicas terminan dentro del paquete de la app.",
+    "Filtrar campos a mano en cada console.log o catch. No requiere una capa común, pero cada punto de registro nuevo puede olvidar un campo sensible y habría que probar cada llamada por separado.",
+    "Registrar el objeto completo del error y confiar en restringir el acceso a los registros. Da más contexto para depurar, pero cualquier persona con acceso a los logs vería sesión, nombres, ubicación o comentarios internos."
+  ],
+  "tradeoff": "Ganamos un punto único de sanitización que se prueba una vez con estructuras anidadas y listas, credenciales en el almacén nativo del dispositivo y errores que no revelan información interna. El costo es más archivos y un puerto de sesión (SessionCredentialStore) que la app todavía no usa porque no hay inicio de sesión, además de menos detalle al depurar porque los errores son genéricos. El riesgo residual es que la protección depende de que todo registro nuevo use logTelemetry y de que los campos nuevos se agreguen a la lista sensible; además, las pruebas usan un doble del módulo nativo, así que el cifrado en reposo no se comprobó en un dispositivo real.",
+  "requirementIds": ["AC-01", "AC-02", "AC-03", "AC-04", "AC-05"],
+  "verification": [
+    {
+      "command": "npx jest --no-watchman --ci --runInBand course-tests/security-storage-errors.test.ts course-tests/negative-tests.test.ts course-tests/public/week-04.test.ts",
+      "result": "PASS: 3 suites y 16 pruebas aprobadas, sin fallos.",
+      "evidence": "course-tests/security-storage-errors.test.ts prueba el almacén seguro y los errores del backend; course-tests/negative-tests.test.ts prueba la sanitización en estructuras anidadas, listas y caminos de error; course-tests/public/week-04.test.ts es la prueba pública de redactForTelemetry."
+    },
+    {
+      "command": "npm run typecheck; npm run lint",
+      "result": "Ambos terminaron sin errores.",
+      "evidence": "src/api/courseBackend.ts usa logTelemetry en sus caminos de error, src/infrastructure/telemetry/logTelemetry.ts llama a redactForTelemetry y src/infrastructure/session/SecureSessionCredentialStore.ts implementa el puerto de sesión."
+    },
+    {
+      "command": "git grep -n -I -E \"(password|passwd|secret|api[_-]?key|access[_-]?token|refresh[_-]?token|private[_-]?key)\" -- . \":(exclude)reports/week-04/*\"",
+      "result": "Las coincidencias correspondieron a documentación, contratos y fixtures públicos; no apareció una credencial productiva.",
+      "evidence": "reports/week-04/secret-scan.json conserva el comando y la observación."
+    }
+  ]
+}
