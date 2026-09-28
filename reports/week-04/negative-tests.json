@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "week": 4,
+  "commitSha": "734b780800cd1f782e3e0815bbd59fcd09fc3df5",
+  "generatedAt": "2026-09-27T22:56:57.6505870-06:00",
+  "checks": [
+    {
+      "id": "nested-sensitive-data-redaction",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --runInBand course-tests/negative-tests.test.ts",
+      "evidence": "La prueba confirmó que authorization, token, name, displayName, location, latitude, longitude, photos e internalComments fueron reemplazados por [REDACTED] dentro de estructuras anidadas y listas."
+    },
+    {
+      "id": "error-path-sensitive-data-redaction",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --runInBand course-tests/negative-tests.test.ts",
+      "evidence": "La prueba confirmó que un payload de error con datos sensibles anidados no conserva el marcador sensible después de aplicar redactForTelemetry."
+    },
+    {
+      "id": "input-not-mutated",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --runInBand course-tests/negative-tests.test.ts",
+      "evidence": "La prueba confirmó que la entrada original conserva sus valores sensibles después de ejecutar la sanitización."
+    },
+    {
+      "id": "safe-technical-context",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --runInBand course-tests/negative-tests.test.ts",
+      "evidence": "La prueba confirmó que incidentId, correlationId, status, attempt y durationMs se conservan mientras los campos sensibles del camino de error son redactados."
+    }
+  ]
+}
