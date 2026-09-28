@@ -47,15 +47,24 @@
       "explanation": "Implementé un puerto de sesión y un adaptador de expo-secure-store que persiste sólo accessToken y refreshToken, elimina entradas corruptas y falla sin usar preferencias planas. En getBackendHealth limité la telemetría a eventos y estado/fase técnicos y unifiqué los mensajes públicos, para que cuerpos remotos y excepciones no expongan información interna. La app aún no realiza login; el adaptador queda integrado en campusOpsServices y probado directamente."
     },
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110600",
+      "commitShas": ["b42b6a3ab33054067aa993c52102872912e6dcbb"],
+      "files": [
+        "course-tests/negative-tests.test.ts",
+        "docs/security-controls.md",
+        "reports/week-04/negative-tests.json",
+        "reports/week-04/secret-scan.json"
+      ],
+      "tests": [
+        "npm.cmd test -- --runInBand course-tests/negative-tests.test.ts"
+      ],
+      "reviews": [
+        "Revisión del resultado del escaneo de secretos mediante git grep."
+      ],
+      "prediction": "Los datos protegidos deben quedar redactados incluso cuando aparecen dentro de objetos anidados, listas y caminos de error, mientras el contexto técnico seguro debe conservarse.",
+      "command": "npm.cmd test -- --runInBand course-tests/negative-tests.test.ts",
+      "observedResult": "1 suite aprobada y 4 pruebas aprobadas, sin fallos.",
+      "explanation": "Se agregaron pruebas negativas con datos sintéticos para verificar que authorization, token, name, displayName, location, latitude, longitude, photos e internalComments sean reemplazados por [REDACTED] en estructuras anidadas y listas, incluso en payloads de error. También se comprobó que la entrada original no sea modificada y que incidentId, correlationId, status, attempt y durationMs permanezcan disponibles. El escaneo de secretos no identificó una credencial productiva en la salida observada; las coincidencias correspondieron a documentación, contratos y fixtures públicos."
     }
   ]
 }
