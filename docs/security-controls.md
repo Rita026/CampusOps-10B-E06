@@ -32,6 +32,18 @@ El almacén protege datos **en reposo**, no frente a un dispositivo comprometido
 
 Referencia de la elección: [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/) y [almacenamiento de datos en Expo](https://docs.expo.dev/develop/user-interface/store-data/).
 
-## 3. Pruebas negativas y verificación (Katherine)
+## 3. Pruebas negativas y verificación (Katherine Daniela Gómez Merino)
 
-[Katherine: describe aquí qué caminos de error probaste y cómo confirmaste que no exponen datos]
+Se realizaron pruebas negativas con datos sintéticos para comprobar que la sanitización evita la exposición de información protegida en registros técnicos, incluso cuando los datos aparecen dentro de estructuras anidadas, listas y caminos de error.
+
+Las pruebas cubrieron datos de sesión y credenciales (`authorization` y `token`), nombres (`name` y `displayName`), ubicación (`location`, `latitude` y `longitude`), fotografías (`photos`) y comentarios internos (`internalComments`). También se verificó que el contexto técnico seguro, como `incidentId`, `correlationId`, `status`, `attempt` y `durationMs`, permanezca disponible.
+
+El comando ejecutado fue:
+
+`npm.cmd test -- --runInBand course-tests/negative-tests.test.ts`
+
+El resultado observado fue de 1 suite aprobada y 4 pruebas aprobadas, sin fallos. Las pruebas comprobaron la sanitización de datos sensibles anidados y en listas, la protección de datos dentro de un camino de error, la conservación de la entrada original sin mutaciones y la preservación del contexto técnico seguro.
+
+Como comprobación adicional se realizó una búsqueda reproducible de términos relacionados con secretos mediante `git grep`. Las coincidencias encontradas correspondieron a documentación, contratos de prueba y fixtures públicos; no se identificó una credencial productiva en la salida observada.
+
+El riesgo residual es que la protección depende de que los nuevos campos sensibles sean incluidos en las reglas de sanitización y de que el código futuro no registre texto libre sin aplicar el control. Por ello, las pruebas negativas deben mantenerse junto con los cambios relacionados con telemetría y manejo de errores.
