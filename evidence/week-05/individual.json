@@ -15,15 +15,31 @@
       "explanation": "parseRemoteResource valida tipo y contenido de cada campo del sobre antes de aceptarlo como válido; cualquier campo que no cumpla el tipo o esté vacío hace que la función devuelva { ok: false, error: 'contract' } en vez de dejar pasar datos con forma incorrecta."
     },
     {
-      "studentId": "REEMPLAZAR_ENRIQUE",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110572",
+      "commitShas": ["d685d60aad7d9f6cb321d784eb3eb80fe34ef0af"],
+      "files": [
+        "src/application/incidents/IncidentClient.ts",
+        "src/domain/incidents/CloudIncident.ts",
+        "src/infrastructure/incidents/CourseIncidentClient.ts",
+        "src/ui/incidents/IncidentsApp.tsx",
+        "src/ui/incidents/IncidentCreateScreen.tsx",
+        "course-tests/courseIncidentClient.test.ts",
+        "course-tests/courseIncidentClient.integration.test.ts",
+        "course-tests/incidentsApp.test.tsx"
+      ],
+      "tests": [
+        "npm.cmd test -- --ci --runInBand course-tests/courseIncidentClient.test.ts course-tests/courseIncidentClient.integration.test.ts course-tests/incidentsApp.test.tsx course-tests/public/week-05.test.ts",
+        "npm.cmd run typecheck",
+        "npm.cmd run lint",
+        "npm.cmd run backend:self-test"
+      ],
+      "reviews": [
+        "Se utilizó asistencia de IA para implementar y revisar el cliente; se contrastó la respuesta con course-backend/campusops.mjs y se ejecutaron las pruebas locales y simuladas antes de registrar el resultado."
+      ],
+      "prediction": "La lista, el detalle y la creación debían consumir el backend didáctico a través de un cliente separado de la UI. Un payload null debía conservarse como detalles ausentes, los datos corruptos debían producir error de contrato y el reintento de una creación tras timeout debía recuperar el mismo recurso con su clave original.",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/courseIncidentClient.test.ts course-tests/courseIncidentClient.integration.test.ts course-tests/incidentsApp.test.tsx course-tests/public/week-05.test.ts",
+      "observedResult": "PASS: 4 suites y 19 pruebas. El backend local confirmó lista, detalle, creación 201, replay 200 y timeout después de guardar sin duplicado; el transporte simulado confirmó payload null, lista vacía, respuesta inválida, timeout, HTTP 500 y falla de red. Typecheck, lint, smoke, backend:self-test y exportación Android también terminaron correctamente.",
+      "explanation": "Implementé el puerto IncidentClient y su adaptador HTTP con parseRemoteResource, validación del payload y conversión a CloudIncident. Las pantallas reciben resultados tipados y nunca hacen HTTP; el formulario conserva la clave idempotente al reintentar el mismo contenido. Los errores y la telemetría usan sólo tipo, operación y estado técnico, sin cuerpos ni datos sensibles."
     },
     {
       "studentId": "REEMPLAZAR_KATHERINE",
