@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "week": 5,
+  "teamId": "E06",
+  "members": [
+    {
+      "studentId": "3523110444",
+      "commitShas": ["c869fa720def28c08c95e9a0db16ef12b00813b9"],
+      "files": ["src/course-evaluation/index.ts", "docs/api-contract.md"],
+      "tests": ["npx jest --no-watchman course-tests/public/week-05.test.ts"],
+      "reviews": [],
+      "prediction": "Esperaba que parseRemoteResource aceptara un sobre con id y status no vacíos, version entera no negativa y payload objeto o null, ignorando campos adicionales, y que rechazara cualquier variación de tipo (id vacío, version como string) o un valor null completo.",
+      "command": "npx jest --no-watchman course-tests/public/week-05.test.ts",
+      "observedResult": "PASS - Test Suites: 1 passed, 1 total; Tests: 5 passed, 5 total. Los 5 casos de la prueba parametrizada (sobre válido, sobre válido con payload null y campo extra, id vacío, version como string, input null) dieron el resultado esperado.",
+      "explanation": "parseRemoteResource valida tipo y contenido de cada campo del sobre antes de aceptarlo como válido; cualquier campo que no cumpla el tipo o esté vacío hace que la función devuelva { ok: false, error: 'contract' } en vez de dejar pasar datos con forma incorrecta."
+    },
+    {
+      "studentId": "REEMPLAZAR_ENRIQUE",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    },
+    {
+      "studentId": "REEMPLAZAR_KATHERINE",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    }
+  ]
+}
