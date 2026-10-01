@@ -5,7 +5,7 @@ export default function App() {
   return (
     <CampusOpsApp
       checkBackendHealth={campusOpsServices.checkBackendHealth}
-      incidentQueries={campusOpsServices.incidentQueries}
+      incidentClient={campusOpsServices.incidentClient}
     />
   );
 }

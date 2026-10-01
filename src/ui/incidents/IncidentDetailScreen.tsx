@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { Incident } from '../../domain/incidents/Incident';
+import type { CloudIncident } from '../../domain/incidents/CloudIncident';
 
 type IncidentDetailScreenProps = Readonly<{
-  incident: Incident | null;
+  incident: CloudIncident | null;
   isLoading: boolean;
   error: string | null;
   onBack: () => void;
@@ -17,36 +17,42 @@ export function IncidentDetailScreen({
   onBack,
   onRetry,
 }: IncidentDetailScreenProps) {
-  if (isLoading) {
-    return <Text accessibilityRole="progressbar">Cargando detalle…</Text>;
-  }
-
-  if (error !== null || incident === null) {
-    return (
-      <View accessibilityRole="alert" style={styles.container}>
-        <Text>{error ?? 'La incidencia solicitada ya no está disponible.'}</Text>
-        <Pressable accessibilityRole="button" onPress={onRetry} style={styles.button}>
-          <Text style={styles.buttonText}>Reintentar</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" onPress={onBack}>
-          <Text>Volver a la lista</Text>
-        </Pressable>
-      </View>
-    );
-  }
-
   return (
-    <View testID="incident-detail" style={styles.container}>
+    <View style={styles.container}>
       <Pressable accessibilityRole="button" onPress={onBack}>
         <Text>← Lista de incidencias</Text>
       </Pressable>
-      <Text style={styles.title}>{incident.title}</Text>
-      <Text>{incident.id} · {incident.category} · prioridad {incident.priority}</Text>
-      <Text>Estado: {incident.status}</Text>
-      <Text>Ubicación: {incident.locationLabel}</Text>
-      <Text>Reportó: {incident.reporterLabel}</Text>
-      <Text>Técnico: {incident.assignedTechnicianLabel ?? 'Sin asignar'}</Text>
-      <Text style={styles.description}>{incident.description}</Text>
+
+      {isLoading ? <Text accessibilityRole="progressbar">Cargando detalle…</Text> : null}
+
+      {!isLoading && (error !== null || incident === null) ? (
+        <View accessibilityRole="alert" style={styles.container}>
+          <Text>{error ?? 'La incidencia solicitada no está disponible.'}</Text>
+          <Pressable accessibilityRole="button" onPress={onRetry} style={styles.button}>
+            <Text style={styles.buttonText}>Reintentar</Text>
+          </Pressable>
+        </View>
+      ) : null}
+
+      {!isLoading && error === null && incident !== null ? (
+        <View testID="incident-detail" style={styles.container}>
+          <Text style={styles.title}>Incidencia {incident.id}</Text>
+          <Text>Estado: {incident.status}</Text>
+          <Text>Versión: {incident.version}</Text>
+          {incident.details === null ? (
+            <Text testID="incident-null-details">Datos de la incidencia no disponibles.</Text>
+          ) : (
+            <>
+              <Text>Categoría: {incident.details.category}</Text>
+              <Text>Prioridad: {incident.details.priority}</Text>
+              <Text>Ubicación: {incident.details.location}</Text>
+              <Text>Reportante: {incident.details.reporterId}</Text>
+              <Text>Técnico: {incident.details.assignedTechnicianId ?? 'Sin asignar'}</Text>
+              <Text style={styles.description}>{incident.details.description}</Text>
+            </>
+          )}
+        </View>
+      ) : null}
     </View>
   );
 }

@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-import type { IncidentQueries } from '../application/incidents/IncidentQueries';
+import type { IncidentClient } from '../application/incidents/IncidentClient';
 import type { CheckBackendHealth } from '../application/system/checkBackendHealth';
 import { IncidentsApp } from './incidents/IncidentsApp';
 
 type CampusOpsAppProps = Readonly<{
-  incidentQueries: IncidentQueries;
+  incidentClient: IncidentClient;
   checkBackendHealth: CheckBackendHealth;
 }>;
 
-export function CampusOpsApp({ incidentQueries, checkBackendHealth }: CampusOpsAppProps) {
+export function CampusOpsApp({ incidentClient, checkBackendHealth }: CampusOpsAppProps) {
   const [status, setStatus] = useState<'checking' | 'available' | 'offline'>('checking');
 
   useEffect(() => {
@@ -25,20 +25,20 @@ export function CampusOpsApp({ incidentQueries, checkBackendHealth }: CampusOpsA
   }, [checkBackendHealth]);
 
   return (
-    <View style={styles.screen}>
+    <ScrollView contentContainerStyle={styles.screen}>
       <View accessibilityRole="summary" style={styles.card}>
         <Text style={styles.title}>CampusOps</Text>
         <Text>Incidencias del campus · entorno académico ficticio</Text>
         <Text testID="backend-status">Backend: {status}</Text>
       </View>
-      <IncidentsApp queries={incidentQueries} />
+      <IncidentsApp client={incidentClient} />
       <StatusBar style="auto" />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, gap: 16, padding: 24 },
+  screen: { flexGrow: 1, gap: 16, padding: 24 },
   card: { gap: 12, paddingVertical: 20 },
   title: { fontSize: 24, fontWeight: '700' },
 });
