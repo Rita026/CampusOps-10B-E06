@@ -42,15 +42,18 @@
       "explanation": "Implementé el puerto IncidentClient y su adaptador HTTP con parseRemoteResource, validación del payload y conversión a CloudIncident. Las pantallas reciben resultados tipados y nunca hacen HTTP; el formulario conserva la clave idempotente al reintentar el mismo contenido. Los errores y la telemetría usan sólo tipo, operación y estado técnico, sin cuerpos ni datos sensibles."
     },
     {
-      "studentId": "REEMPLAZAR_KATHERINE",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
+      "studentId": "3523110600",
+      "commitShas": ["2b87226987210d67e666326b0db291d42a05f76d"],
+      "files": [
+         "reports/week-05/contract-tests.json",
+        "reports/week-05/failure-matrix.json"
+      ],
+      "tests": ["npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand"],
       "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "prediction": "Esperaba que las cinco situaciones solicitadas por la actividad fueran diferenciadas por el cliente: una respuesta exitosa y un payload null válido debían aceptarse, mientras que una respuesta malformed, un timeout y un error HTTP 500 debían clasificarse como fallas distintas.",
+      "command": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand",
+      "observedResult": "PASS: 1 suite y 3 pruebas. La integración con el backend local confirmó los escenarios de respuesta exitosa, payload nullable, respuesta malformed, timeout y error HTTP 500. Los escenarios de fallo fueron clasificados como contract, timeout y server respectivamente.",
+      "explanation": "Registré los resultados de las pruebas de contrato en contract-tests.json y failure-matrix.json. La evidencia distingue los casos nominales, de frontera y de fallo para demostrar que el cliente no trata de la misma manera una ausencia válida, una respuesta malformada, un timeout o un error 500."
     }
   ]
 }
