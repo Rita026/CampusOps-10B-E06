@@ -1,0 +1,22 @@
+﻿{
+  "schemaVersion": 1,
+  "week": 5,
+  "commitSha": "12e3ab38a0affab991e9e22d8f151834dffed272",
+  "generatedAt": "2026-10-02T04:51:26.5379433Z",
+  "checks": [
+    {
+      "id": "success-local-backend",
+      "status": "pass",
+      "scenarioType": "nominal",
+      "command": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand",
+      "evidence": "La suite de integración pasó 3/3 pruebas. El caso 'list, detail, create and idempotent replay use the real local backend' pasó correctamente y confirmó el consumo del backend local."
+    },
+    {
+      "id": "nullable-payload",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand",
+      "evidence": "El caso 'nullable is valid absence while malformed, timeout and 500 are distinct' pasó; la respuesta nullable fue aceptada y el payload null se conservó como ausencia válida."
+    }
+  ]
+}
