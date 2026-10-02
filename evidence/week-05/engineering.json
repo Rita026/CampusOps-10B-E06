@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "week": 5,
+  "commitSha": "12e3ab38a0affab991e9e22d8f151834dffed272",
+  "substantiveDecision": "Separar la validación del contrato de la lógica de consumo de la API y registrar de forma diferenciada las respuestas válidas y los fallos de contrato, timeout y servidor.",
+  "alternatives": [
+    "Aceptar las respuestas del backend directamente y dejar que cada pantalla interprete su estructura.",
+    "Tratar cualquier respuesta distinta de éxito como un único error genérico.",
+    "Validar el sobre de respuesta en el cliente y clasificar cada tipo de fallo antes de entregarlo a la UI."
+  ],
+  "tradeoff": "La validación centralizada agrega reglas y pruebas al cliente, pero evita que cada pantalla interprete respuestas remotas de manera diferente y permite distinguir una ausencia válida de una respuesta inválida o de un fallo de transporte.",
+  "requirementIds": [
+    "AC-01",
+    "AC-02",
+    "AC-03",
+    "AC-04",
+    "AC-05"
+  ],
+  "verification": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand; la suite terminó PASS con 3 pruebas y confirmó los escenarios de respuesta exitosa, payload nullable, malformed, timeout y HTTP 500."
+}

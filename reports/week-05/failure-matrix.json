@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "week": 5,
+  "commitSha": "12e3ab38a0affab991e9e22d8f151834dffed272",
+  "generatedAt": "2026-10-02T04:51:40.7479755Z",
+  "checks": [
+    {
+      "id": "malformed-response",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand",
+      "evidence": "El escenario malformed fue rechazado por el cliente como error de contrato: kind 'contract'. La suite terminó PASS."
+    },
+    {
+      "id": "timeout-response",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand",
+      "evidence": "El escenario slow con timeout configurado fue rechazado como kind 'timeout'. La suite terminó PASS y el log de telemetría mostró operation 'list', kind 'timeout'."
+    },
+    {
+      "id": "server-error-response",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npx jest course-tests/courseIncidentClient.integration.test.ts --runInBand",
+      "evidence": "El escenario server_error fue clasificado como kind 'server' con status 500. La suite terminó PASS y el log mostró operation 'list', kind 'server', status 500."
+    }
+  ]
+}
