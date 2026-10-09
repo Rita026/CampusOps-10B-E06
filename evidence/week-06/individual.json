@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "week": 6,
+  "teamId": "E06",
+  "members": [
+    {
+      "studentId": "3523110444",
+      "commitShas": ["318c9bf63ae7d334dfa72b3d326d9085d742e580"],
+      "files": ["src/course-evaluation/index.ts", "docs/session-state-machine.mmd"],
+      "tests": ["npx jest --no-watchman course-tests/public/week-06.test.ts"],
+      "reviews": [],
+      "prediction": "Esperaba que coordinateRefresh agrupara varias respuestas 401 simultáneas en una sola renovación, reintentara cada solicitud acumulada una vez con el token nuevo, y que logout y refreshFailed dejaran la sesión en anónimo sin token persistido.",
+      "command": "npx jest --no-watchman course-tests/public/week-06.test.ts",
+      "observedResult": "PASS - Test Suites: 1 passed, 1 total; Tests: 2 passed, 2 total. Las pruebas 'coalesces concurrent 401s into one refresh and retries each request once' y 'logout removes persisted session state' pasaron.",
+      "explanation": "coordinateRefresh acumula los requestId de cada 401 recibido y los reintenta una sola vez cuando llega refreshSucceeded, contando una única renovación sin importar cuántas solicitudes fallaron; en refreshFailed y logout limpia el token y vuelve a anónimo. Al integrar mi código, un reemplazo completo de index.ts borró redactForTelemetry y parseRemoteResource de semanas anteriores; lo detecté al revisar el commit y lo corregí restaurándolas, comprobando que las pruebas públicas de las semanas 4, 5 y 6 pasan."
+    },
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    },
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": [],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    }
+  ]
+}
