@@ -15,15 +15,43 @@
       "explanation": "coordinateRefresh acumula los requestId de cada 401 recibido y los reintenta una sola vez cuando llega refreshSucceeded, contando una única renovación sin importar cuántas solicitudes fallaron; en refreshFailed y logout limpia el token y vuelve a anónimo. Al integrar mi código, un reemplazo completo de index.ts borró redactForTelemetry y parseRemoteResource de semanas anteriores; lo detecté al revisar el commit y lo corregí restaurándolas, comprobando que las pruebas públicas de las semanas 4, 5 y 6 pasan."
     },
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110572",
+      "commitShas": [
+        "923baf2d11133e75bf1deabc828aff52e00a2f6e"
+      ],
+      "files": [
+        "src/application/session/SessionManager.ts",
+        "src/application/session/refreshState.ts",
+        "src/infrastructure/session/CourseSessionGateway.ts",
+        "src/infrastructure/incidents/CourseIncidentClient.ts",
+        "src/application/incidents/incidentAuthorization.ts",
+        "src/bootstrap/campusOpsServices.ts",
+        "src/ui/SessionPanel.tsx",
+        "src/ui/CampusOpsApp.tsx",
+        "src/ui/incidents/IncidentsApp.tsx",
+        "course-tests/sessionManager.test.ts",
+        "course-tests/sessionGateway.test.ts",
+        "course-tests/sessionRefreshState.test.ts",
+        "course-tests/sessionIncidentClient.test.ts",
+        "course-tests/sessionClient.integration.test.ts",
+        "course-tests/sessionApp.test.tsx",
+        "docs/session-state-machine.mmd"
+      ],
+      "tests": [
+        "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+        "npm.cmd run typecheck",
+        "npm.cmd run lint",
+        "npm.cmd run backend:self-test",
+        "npm.cmd run bundle:release"
+      ],
+      "reviews": [
+        "Asistencia material de IA mediante ECC security-review e implementación/revisión paralela; verificación contra course-backend/campusops.mjs y pruebas ejecutadas con Node 22.22.0.",
+        "La revisión detectó logout entre lectura de credenciales y envío de un POST, y falta de botón para reintentar borrado automático fallido. Se corrigieron y se añadieron pruebas que reproducen ambas situaciones."
+      ],
+      "prediction": "Con login conectado al cliente esperaba que lista, detalle y creación simultáneos que recibieran 401 compartieran una sola renovación y reintentaran una vez con el mismo cuerpo y clave. Si la renovación fallaba o llegaba después de logout, las operaciones debían terminar sin recuperar tokens. El técnico debía resolver sólo su asignación actual y únicamente coordinación debía cerrar o reabrir.",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "observedResult": "PASS: 7 suites, 65 pruebas. El backend real mostró 3 respuestas 401, 1 refresh y 3 reintentos (6 solicitudes de incidencias). El transporte controlado confirmó un segundo 401 sin bucle, refresh fallido compartido y 401 tardío sin nueva renovación. Expiración comprobada a 60000 ms con reloj inyectado; logout eliminó credenciales aun con escritura pendiente y evitó POST/reintentos posteriores. Cliente y backend denegaron operaciones de perfiles o asignaciones incorrectos. Typecheck, lint, backend:self-test, npm ci y exportación Android terminaron correctamente.",
+      "explanation": "Conecté el inicio de sesión, los tokens de SecureStore y el cliente de incidencias mediante SessionManager. El adapter coordinateRefresh usa el mismo reducer que la sesión real. La generación evita renovar nuevamente un token anterior y descarta resultados de otra sesión; la cola serializa guardado y borrado para que logout deje el almacén vacío. Cada request usa como máximo un reintento y verifica generación antes de enviar y al recibir. Los permisos se validan en la lógica del cliente y otra vez en el backend; la UI refleja el perfil sin sustituir esos controles. El diagrama se actualizó para representar la implementación. Esta evidencia registra únicamente mi integración y conserva los registros de mis compañeros."
     },
     {
       "studentId": "REEMPLAZAR",

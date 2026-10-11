@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "week": 6,
+  "commitSha": "923baf2d11133e75bf1deabc828aff52e00a2f6e",
+  "studentId": "3523110572",
+  "decision": "La integración usa un único SessionManager compartido por la UI y CourseIncidentClient. coordinateRefresh evaluable delega al reducer real que utiliza el manager. Una promesa single-flight agrupa la renovación de las credenciales; cada solicitud reintenta como máximo una vez conservando cuerpo e Idempotency-Key. El actor y su perfil se obtienen del login validado, se comprueban permisos en el cliente y el backend conserva la validación final de asignación, versión y transición.",
+  "alternatives": [
+    "Renovar por cada respuesta 401: resulta simple por solicitud, pero tres operaciones simultáneas consumen tres renovaciones y compiten al guardar tokens.",
+    "Compartir una promesa sin versión de sesión: evita renovaciones simultáneas, pero un 401 tardío o una respuesta de refresh posterior a logout puede recuperar credenciales obsoletas.",
+    "Compartir la promesa por generación de credenciales, invalidar al cerrar o cambiar sesión y ordenar save/clear: evita duplicados, reintentos ilimitados y restauraciones posteriores a logout."
+  ],
+  "tradeoff": "La política elegida reduce llamadas al backend y evita que una respuesta tardía restaure una sesión cerrada, a costa de mantener generaciones, una cola de almacenamiento y pruebas de orden de eventos. Se limita a un reintento; si vuelve 401 se revoca la sesión y se borra SecureStore. Si el borrado falla, se bloquea la autorización y se muestra un cierre reintentable, sin afirmar que los tokens ya se eliminaron. El backend es un fixture académico: devuelve el mismo accessToken y sólo admite el refresh original; una segunda expiración con refresh rotado vuelve al estado no autenticado. La aplicación arranca sin actor autenticado y requiere login, sin inventar el rol a partir de tokens guardados.",
+  "requirementIds": [
+    "AC-01",
+    "AC-02",
+    "AC-03",
+    "AC-04",
+    "AC-05"
+  ],
+  "verification": [
+    {
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "result": "PASS: 7 suites y 65 pruebas de sesión y semana 6.",
+      "evidence": "HTTP real, transporte controlado, reloj inyectado, almacenamiento protegido mediante su puerto y pruebas de UI. auth-tests.json y concurrency.json indexan nominales, límites y fallas."
+    },
+    {
+      "command": "npm.cmd run typecheck; npm.cmd run lint",
+      "result": "PASS: TypeScript sin errores; ESLint 0 errores.",
+      "evidence": "Se mantiene el stack y las pruebas anteriores. Un warning BOM pertenece a week-06-probe.test.ts preexistente local que no se incluye en esta aportación."
+    },
+    {
+      "command": "npm.cmd run backend:self-test",
+      "result": "PASS: Controlled backend self-test passed.",
+      "evidence": "El backend verifica roles, reasignación, versión obsoleta, respuesta perdida e idempotencia sin depender de botones de UI."
+    },
+    {
+      "command": "npm.cmd ci; npm.cmd run audit:ci; npm.cmd run bundle:release",
+      "result": "PASS con Node 22.22.0: instalación reproducible, gate de dependencias críticas y exportación Android.",
+      "evidence": "Expo exportó el bundle Android de 600 módulos en dist/export. Audit:ci terminó 0 con 0 críticas; informó 24 altas y 5 moderadas del lockfile existente. La exportación no se presenta como APK instalado."
+    }
+  ],
+  "assistance": "Se utilizó asistencia de IA con ECC security-review, implementación y revisión paralela. Las propuestas se contrastaron con el backend y se verificaron mediante pruebas ejecutadas, types, lint y exportación Android.",
+  "teamCompletion": "Este documento registra la decisión de esta integración. El tercer registro individual del equipo continúa pendiente; no se atribuyen aportaciones ajenas ni se fija week-06-final."
+}

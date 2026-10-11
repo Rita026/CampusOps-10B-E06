@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "week": 6,
+  "commitSha": "923baf2d11133e75bf1deabc828aff52e00a2f6e",
+  "generatedAt": "2026-10-11T23:51:46Z",
+  "studentId": "3523110572",
+  "checks": [
+    {
+      "id": "login-and-protected-ui",
+      "status": "pass",
+      "scenarioType": "nominal",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "7 suites y 65 pruebas PASS. Login real identifica actor/rol validado; actor desconocido queda anonymous. La UI no consulta incidencias antes del login y vuelve al login al cerrar."
+    },
+    {
+      "id": "expiry-controlled-clock",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Con reloj inyectado la sesión permanece authenticated a 59999 ms y pasa a expired a 60000 ms; solicita una renovación HTTP real antes de enviar la siguiente incidencia."
+    },
+    {
+      "id": "profiles-and-assignment",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Backend real: técnico asignado start/resolve, coordinación close/reopen. Técnico ajeno, reportante y coordinación intentando resolve reciben 403; la reasignación impide operar al técnico anterior. El cliente valida permisos antes del POST y el servidor vuelve a verificarlos."
+    },
+    {
+      "id": "failed-refresh",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Refresh HTTP real invalid_refresh: tres solicitudes expiradas comparten una renovación fallida, no envían ninguna incidencia, retornan unauthorized y borran las credenciales. Nuevas solicitudes no vuelven a renovar."
+    },
+    {
+      "id": "obsolete-login-refresh",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Una respuesta tardía de login/refresh posterior a logout o a otro login no restaura sesión ni tokens; una renovación anterior tampoco borra las credenciales del actor nuevo."
+    },
+    {
+      "id": "logout-and-storage-order",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Logout invalida la generación inmediatamente y espera la cola save/clear. Si hay una escritura pendiente, el borrado termina después; el almacén queda vacío. Un POST detenido en la espera de credenciales no se envía si ocurre logout."
+    },
+    {
+      "id": "storage-delete-failure",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Al fallar el borrado nativo la autorización queda bloqueada en logging_out sin actor. La UI ofrece reintentar Cerrar sesión, deshabilita login y al recuperar almacenamiento elimina los tokens; no se declara borrado exitoso antes de tiempo."
+    },
+    {
+      "id": "token-free-telemetry",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Los snapshots y logs no contienen accessToken/refreshToken. Pruebas espían consola y comprueban ausencia de marcadores sintéticos de credenciales y errores nativos."
+    },
+    {
+      "id": "action-idempotent-replay",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Un start HTTP real devuelve timeout después de guardar; repetir el mismo cuerpo, baseVersion e Idempotency-Key recupera duplicate=true, version=3 e in_progress sin aplicar la acción dos veces."
+    }
+  ]
+}

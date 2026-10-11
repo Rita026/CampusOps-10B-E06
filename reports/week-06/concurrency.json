@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "week": 6,
+  "commitSha": "923baf2d11133e75bf1deabc828aff52e00a2f6e",
+  "generatedAt": "2026-10-11T23:51:46Z",
+  "studentId": "3523110572",
+  "refreshPolicy": {
+    "singleFlight": true,
+    "maxRetriesPerRequest": 1,
+    "clock": "injected",
+    "generationGuards": true
+  },
+  "observedConcurrentRequests": 3,
+  "observedUnauthorizedResponses": 3,
+  "observedRefreshCalls": 1,
+  "observedRetries": 3,
+  "observedIncidentAttempts": 6,
+  "checks": [
+    {
+      "id": "three-real-http-401s",
+      "status": "pass",
+      "scenarioType": "nominal",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Lista, detalle y creación en paralelo: 3 respuestas HTTP 401 reales, 1 POST /v1/session/refresh, 3 reintentos y 6 solicitudes de incidencias en total; las tres operaciones terminan con éxito."
+    },
+    {
+      "id": "forty-shared-refresh-waiters",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "SessionManager: 40 consumidores de credenciales expiradas comparten una renovación; 40 llamadas coordinateRefresh con 401 comparten exactamente la misma promesa. No se utilizan esperas reales para provocar expiración."
+    },
+    {
+      "id": "late-401-old-generation",
+      "status": "pass",
+      "scenarioType": "boundary",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Un 401 llega después de finalizar el refresh de otra solicitud: se reusa la generación nueva; 1 refresh, 2 respuestas 401 y 4 intentos de incidencias en total. También se verifica el fixture que devuelve la misma cadena accessToken."
+    },
+    {
+      "id": "second-401-no-loop",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Una operación recibe 401 original y 401 del reintento: exactamente 1 refresh y 2 envíos; retorna unauthorized, borra credenciales y no entra en un nuevo ciclo de renovación."
+    },
+    {
+      "id": "failed-shared-flight",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Transporte controlado: 3 solicitudes reciben 401, comparten 1 refresh fallido, hacen 0 reintentos y terminan en unauthorized. Estado anonymous y almacén vacío."
+    },
+    {
+      "id": "logout-during-flight",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --ci --runInBand course-tests/session course-tests/public/week-06.test.ts",
+      "evidence": "Logout mientras refresh está pendiente: se descarta la respuesta exitosa tardía, se realizan 0 reintentos, la solicitud termina y el almacén permanece vacío."
+    }
+  ]
+}
