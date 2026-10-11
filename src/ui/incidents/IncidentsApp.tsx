@@ -5,13 +5,20 @@ import type {
   CreateIncidentInput,
   IncidentClient,
   IncidentClientErrorKind,
+  IncidentActionClient,
 } from '../../application/incidents/IncidentClient';
+import {
+  canPerformIncidentAction,
+  isAllowedIncidentTransition,
+  type IncidentActor,
+  type IncidentActionInput,
+} from '../../application/incidents/incidentAuthorization';
 import type { CloudIncident } from '../../domain/incidents/CloudIncident';
 import { IncidentCreateScreen } from './IncidentCreateScreen';
 import { IncidentDetailScreen } from './IncidentDetailScreen';
 import { IncidentListScreen } from './IncidentListScreen';
 
-type IncidentsAppProps = Readonly<{ client: IncidentClient }>;
+type IncidentsAppProps = Readonly<{ client: IncidentClient & Partial<IncidentActionClient>; actor?: IncidentActor }>;
 type Screen = 'list' | 'detail' | 'create';
 type CreateAttempt = Readonly<{ signature: string; key: string }>;
 
@@ -36,7 +43,7 @@ function newOperationKey(): string {
   return `create-${Date.now().toString(36)}-${operationSequence.toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
 
-export function IncidentsApp({ client }: IncidentsAppProps) {
+export function IncidentsApp({ client, actor }: IncidentsAppProps) {
   const [screen, setScreen] = useState<Screen>('list');
   const [incidents, setIncidents] = useState<readonly CloudIncident[]>([]);
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
@@ -47,6 +54,9 @@ export function IncidentsApp({ client }: IncidentsAppProps) {
   const [listError, setListError] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [isApplyingAction, setIsApplyingAction] = useState(false);
+  const actionInFlight = useRef(false);
+  const actionAttempt = useRef<CreateAttempt | null>(null);
   const listRequestId = useRef(0);
   const detailRequestId = useRef(0);
   const createInFlight = useRef(false);
@@ -123,6 +133,7 @@ export function IncidentsApp({ client }: IncidentsAppProps) {
   };
 
   const openCreate = () => {
+    if (actor && actor.role !== 'reporter') return;
     createAttempt.current = null;
     setCreateError(null);
     setScreen('create');
@@ -133,6 +144,7 @@ export function IncidentsApp({ client }: IncidentsAppProps) {
   };
 
   const submitCreate = async (input: CreateIncidentInput) => {
+    if (actor && actor.role !== 'reporter') return;
     if (createInFlight.current) return;
     createInFlight.current = true;
     const signature = JSON.stringify(input);
@@ -162,10 +174,49 @@ export function IncidentsApp({ client }: IncidentsAppProps) {
     }
   };
 
+  const applyAction = async (action: IncidentActionInput['action'], diagnosis: string) => {
+    if (!client.applyAction || !actor || !selectedIncident || actionInFlight.current) return;
+    if (!canPerformIncidentAction(actor, selectedIncident, action)) {
+      setDetailError(ERROR_MESSAGES.forbidden);
+      return;
+    }
+    actionInFlight.current = true;
+    setIsApplyingAction(true);
+    setDetailError(null);
+    const input: IncidentActionInput = action === 'resolve'
+      ? { action, baseVersion: selectedIncident.version, diagnosis }
+      : { action, baseVersion: selectedIncident.version };
+    const signature = JSON.stringify({ incidentId: selectedIncident.id, ...input });
+    if (actionAttempt.current?.signature !== signature) {
+      actionAttempt.current = { signature, key: newOperationKey() };
+    }
+    try {
+      const result = await client.applyAction(selectedIncident.id, input, actionAttempt.current.key);
+      if (result.ok) {
+        actionAttempt.current = null;
+        setSelectedIncident(result.value.incident);
+        void loadList();
+      } else {
+        setDetailError(ERROR_MESSAGES[result.error.kind]);
+      }
+    } catch {
+      setDetailError('No fue posible actualizar la incidencia. Puedes reintentar.');
+    } finally {
+      actionInFlight.current = false;
+      setIsApplyingAction(false);
+    }
+  };
+
   if (screen === 'detail' && selectedIncidentId !== null) {
     return (
       <View style={styles.section}>
         <IncidentDetailScreen
+          actions={actor && selectedIncident && client.applyAction
+            ? (['start', 'resolve', 'close', 'reopen'] as const).filter((action) =>
+              canPerformIncidentAction(actor, selectedIncident, action) && isAllowedIncidentTransition(selectedIncident, action))
+            : []}
+          isApplyingAction={isApplyingAction}
+          onAction={(action, diagnosis) => void applyAction(action, diagnosis)}
           error={detailError}
           incident={selectedIncident}
           isLoading={isLoadingDetail}
@@ -197,6 +248,7 @@ export function IncidentsApp({ client }: IncidentsAppProps) {
   return (
     <View style={styles.section}>
       <IncidentListScreen
+        canCreate={actor === undefined || actor.role === 'reporter'}
         error={listError}
         incidents={incidents}
         isLoading={isLoadingList}

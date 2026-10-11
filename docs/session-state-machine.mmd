@@ -1,11 +1,30 @@
 stateDiagram-v2
   [*] --> Anonymous
-  Anonymous --> Authenticating: login
-  Authenticating --> Authenticated: login succeeded
-  Authenticating --> Anonymous: login failed
-  Authenticated --> Authenticated: request ok
-  Authenticated --> Refreshing: request401 (primera de varias simultaneas)
-  Refreshing --> Refreshing: request401 adicional (se acumula, no dispara otra renovacion)
-  Refreshing --> Authenticated: refreshSucceeded (reintenta solicitudes acumuladas)
-  Refreshing --> Anonymous: refreshFailed (token y sesion se limpian)
-  Authenticated --> Anonymous: logout
+  Anonymous --> Authenticating: login / borrar credenciales anteriores
+  Authenticating --> Authenticated: login valido / guardar en SecureStore
+  Authenticating --> Anonymous: login invalido o fallo de almacenamiento
+  Authenticated --> Authenticated: solicitud autorizada
+  Authenticated --> Expired: reloj >= expiresAt o primer 401
+  Expired --> Refreshing: coordinateRefresh / una promesa compartida
+  Refreshing --> Refreshing: 401 simultaneo / esperar la misma promesa
+  Refreshing --> Authenticated: renovar y guardar / generation + 1 / un reintento
+  Refreshing --> Anonymous: renovacion fallida / invalidar y borrar credenciales
+  Authenticated --> Anonymous: segundo 401 / sin mas reintentos / borrar credenciales
+  Anonymous --> LoggingOut: logout
+  Authenticating --> LoggingOut: logout / invalidar respuesta pendiente
+  Authenticated --> LoggingOut: logout / invalidar credenciales en memoria
+  Expired --> LoggingOut: logout
+  Refreshing --> LoggingOut: logout / descartar renovacion tardia
+  LoggingOut --> Anonymous: borrado seguro completado
+  LoggingOut --> LoggingOut: fallo de borrado / informar y reintentar cierre
+  Anonymous --> LoggingOut: fallo al borrar despues de una revocacion
+  Authenticated --> Authenticating: otro login / invalidar generacion anterior
+  Expired --> Authenticating: otro login
+  Refreshing --> Authenticating: otro login / descartar renovacion anterior
+  note right of Anonymous
+    La generacion invalida respuestas de login,
+    renovacion y solicitudes de sesiones anteriores.
+    La cola de almacenamiento ordena save antes de clear.
+    Si clear falla, se informa el error y no se autoriza
+    ninguna solicitud; el borrado puede reintentarse.
+  end note

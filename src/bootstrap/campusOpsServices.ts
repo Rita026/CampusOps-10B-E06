@@ -2,6 +2,8 @@ import { Platform } from 'react-native';
 
 import { createBackendHealthCheck } from '../application/system/checkBackendHealth';
 import { CourseIncidentClient } from '../infrastructure/incidents/CourseIncidentClient';
+import { SessionManager } from '../application/session/SessionManager';
+import { CourseSessionGateway } from '../infrastructure/session/CourseSessionGateway';
 import { SecureSessionCredentialStore } from '../infrastructure/session/SecureSessionCredentialStore';
 import { CourseBackendHealthGateway } from '../infrastructure/system/CourseBackendHealthGateway';
 
@@ -12,8 +14,15 @@ import { CourseBackendHealthGateway } from '../infrastructure/system/CourseBacke
 const backendUrl = process.env.EXPO_PUBLIC_COURSE_BACKEND_URL
   ?? (Platform.OS === 'android' ? 'http://10.0.2.2:4310' : 'http://127.0.0.1:4310');
 
+const sessionCredentials = new SecureSessionCredentialStore();
+const session = new SessionManager({
+  gateway: new CourseSessionGateway({ baseUrl: backendUrl }),
+  credentialStore: sessionCredentials,
+});
+
 export const campusOpsServices = {
-  incidentClient: new CourseIncidentClient({ baseUrl: backendUrl }),
+  incidentClient: new CourseIncidentClient({ baseUrl: backendUrl, session }),
   checkBackendHealth: createBackendHealthCheck(new CourseBackendHealthGateway(backendUrl)),
-  sessionCredentials: new SecureSessionCredentialStore(),
+  sessionCredentials,
+  session,
 } as const;

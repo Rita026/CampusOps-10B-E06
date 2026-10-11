@@ -6,6 +6,7 @@ export default function App() {
     <CampusOpsApp
       checkBackendHealth={campusOpsServices.checkBackendHealth}
       incidentClient={campusOpsServices.incidentClient}
+      session={campusOpsServices.session}
     />
   );
 }

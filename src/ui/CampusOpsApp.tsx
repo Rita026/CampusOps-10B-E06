@@ -1,18 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import type { IncidentClient } from '../application/incidents/IncidentClient';
 import type { CheckBackendHealth } from '../application/system/checkBackendHealth';
+import type { SessionAccess } from '../application/session/SessionAccess';
 import { IncidentsApp } from './incidents/IncidentsApp';
+import { SessionPanel } from './SessionPanel';
 
 type CampusOpsAppProps = Readonly<{
   incidentClient: IncidentClient;
   checkBackendHealth: CheckBackendHealth;
+  session: SessionAccess;
 }>;
 
-export function CampusOpsApp({ incidentClient, checkBackendHealth }: CampusOpsAppProps) {
+export function CampusOpsApp({ incidentClient, checkBackendHealth, session }: CampusOpsAppProps) {
   const [status, setStatus] = useState<'checking' | 'available' | 'offline'>('checking');
+  const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot);
 
   useEffect(() => {
     let active = true;
@@ -31,7 +35,9 @@ export function CampusOpsApp({ incidentClient, checkBackendHealth }: CampusOpsAp
         <Text>Incidencias del campus · entorno académico ficticio</Text>
         <Text testID="backend-status">Backend: {status}</Text>
       </View>
-      <IncidentsApp client={incidentClient} />
+      <SessionPanel session={session} snapshot={snapshot} />
+      {snapshot.actor !== null && ['authenticated', 'expired', 'refreshing'].includes(snapshot.status)
+        ? <IncidentsApp actor={snapshot.actor} client={incidentClient} key={snapshot.actor.id} /> : null}
       <StatusBar style="auto" />
     </ScrollView>
   );

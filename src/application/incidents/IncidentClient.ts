@@ -1,5 +1,6 @@
 import type { IncidentCategory } from '../../campusops/contracts';
 import type { CloudIncident } from '../../domain/incidents/CloudIncident';
+import type { IncidentActionInput } from './incidentAuthorization';
 
 export type IncidentClientErrorKind =
   | 'contract'
@@ -41,6 +42,14 @@ export interface IncidentClient {
   getIncidentDetail(incidentId: string): Promise<IncidentClientResult<CloudIncident>>;
   createIncident(
     input: CreateIncidentInput,
+    idempotencyKey: string,
+  ): Promise<IncidentClientResult<CreatedIncident>>;
+}
+
+export interface IncidentActionClient extends IncidentClient {
+  applyAction(
+    incidentId: string,
+    input: IncidentActionInput,
     idempotencyKey: string,
   ): Promise<IncidentClientResult<CreatedIncident>>;
 }

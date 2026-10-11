@@ -7,6 +7,7 @@ import type {
   SyncRecord,
 } from './contracts';
 import type { IncidentLocation } from '../campusops/contracts';
+import { reduceRefreshEvents, type RefreshSummary } from '../application/session/refreshState';
 
 function pending(name: string): never {
   throw new Error(`${name} must be implemented in the assigned week`);
@@ -70,56 +71,8 @@ export function parseRemoteResource(input: unknown): ParseResult {
   };
 }
 
-export function coordinateRefresh(events: readonly AuthEvent[]): Readonly<{
-  status: 'anonymous' | 'authenticated';
-  activeGeneration: number | null;
-  refreshCalls: number;
-  retriedRequestIds: readonly string[];
-  persistedToken: string | null;
-}> {
-  let status: 'anonymous' | 'authenticated' = 'anonymous';
-  let activeGeneration: number | null = null;
-  let refreshCalls = 0;
-  let pendingRequestIds: string[] = [];
-  let retriedRequestIds: string[] = [];
-  let persistedToken: string | null = null;
-
-  for (const event of events) {
-    switch (event.type) {
-      case 'request401': {
-        if (event.requestId) {
-          pendingRequestIds.push(event.requestId);
-        }
-        break;
-      }
-      case 'refreshSucceeded': {
-        refreshCalls += 1;
-        status = 'authenticated';
-        activeGeneration = event.generation ?? activeGeneration;
-        persistedToken = event.token ?? persistedToken;
-        retriedRequestIds = [...retriedRequestIds, ...pendingRequestIds];
-        pendingRequestIds = [];
-        break;
-      }
-      case 'refreshFailed': {
-        refreshCalls += 1;
-        status = 'anonymous';
-        activeGeneration = null;
-        persistedToken = null;
-        pendingRequestIds = [];
-        break;
-      }
-      case 'logout': {
-        status = 'anonymous';
-        activeGeneration = null;
-        persistedToken = null;
-        pendingRequestIds = [];
-        break;
-      }
-    }
-  }
-
-  return { status, activeGeneration, refreshCalls, retriedRequestIds, persistedToken };
+export function coordinateRefresh(events: readonly AuthEvent[]): RefreshSummary {
+  return reduceRefreshEvents(events);
 }
 
 export function resolveSync(

@@ -9,6 +9,7 @@ type IncidentListScreenProps = Readonly<{
   onSelect: (incidentId: string) => void;
   onRetry: () => void;
   onCreate: () => void;
+  canCreate?: boolean;
 }>;
 
 export function IncidentListScreen({
@@ -18,12 +19,13 @@ export function IncidentListScreen({
   onSelect,
   onRetry,
   onCreate,
+  canCreate = true,
 }: IncidentListScreenProps) {
   return (
     <View style={styles.list}>
-      <Pressable accessibilityRole="button" onPress={onCreate} style={styles.createButton} testID="open-create-incident">
+      {canCreate ? <Pressable accessibilityRole="button" onPress={onCreate} style={styles.createButton} testID="open-create-incident">
         <Text style={styles.buttonText}>Crear incidencia</Text>
-      </Pressable>
+      </Pressable> : null}
 
       {isLoading ? <Text accessibilityRole="progressbar">Cargando incidencias…</Text> : null}
 

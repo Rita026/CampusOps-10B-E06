@@ -1,10 +1,18 @@
 import type {
   CreateIncidentInput,
   CreatedIncident,
-  IncidentClient,
+  IncidentActionClient,
   IncidentClientErrorKind,
   IncidentClientResult,
 } from '../../application/incidents/IncidentClient';
+import {
+  canCreateIncident,
+  canPerformIncidentAction,
+  canReadIncident,
+  type IncidentActionInput,
+  type IncidentActor,
+} from '../../application/incidents/incidentAuthorization';
+import type { RequestCredentials, SessionAccess } from '../../application/session/SessionAccess';
 import type { IncidentCategory, IncidentStatus } from '../../campusops/contracts';
 import { parseRemoteResource } from '../../course-evaluation';
 import type { CloudIncident, IncidentDetails } from '../../domain/incidents/CloudIncident';
@@ -17,6 +25,7 @@ type CourseScenario =
   | 'slow'
   | 'server_error'
   | 'rate_limited'
+  | 'invalid_refresh'
   | 'timeout_after_commit';
 
 export type CourseIncidentClientOptions = Readonly<{
@@ -26,6 +35,7 @@ export type CourseIncidentClientOptions = Readonly<{
   scenario?: CourseScenario;
   timeoutMs?: number;
   transport?: typeof fetch;
+  session?: SessionAccess;
 }>;
 
 type JsonResponse = Readonly<{ status: number; body: unknown }>;
@@ -105,13 +115,14 @@ function statusError(status: number): IncidentClientErrorKind {
 }
 
 /** HTTP adapter for the local, synthetic CampusOps backend. */
-export class CourseIncidentClient implements IncidentClient {
+export class CourseIncidentClient implements IncidentActionClient {
   private readonly baseUrl: string;
   private readonly actorId: string;
   private readonly accessToken: string;
   private readonly scenario: CourseScenario;
   private readonly timeoutMs: number;
   private readonly transport: typeof fetch;
+  private readonly session: SessionAccess | undefined;
 
   public constructor(options: CourseIncidentClientOptions = {}) {
     this.baseUrl = (options.baseUrl ?? process.env.EXPO_PUBLIC_COURSE_BACKEND_URL ?? 'http://127.0.0.1:4310').replace(/\/+$/, '');
@@ -121,6 +132,7 @@ export class CourseIncidentClient implements IncidentClient {
     this.timeoutMs = options.timeoutMs !== undefined && Number.isFinite(options.timeoutMs) && options.timeoutMs > 0
       ? options.timeoutMs : 3000;
     this.transport = options.transport ?? fetch;
+    this.session = options.session;
   }
 
   public async listIncidents(): Promise<IncidentClientResult<readonly CloudIncident[]>> {
@@ -135,6 +147,8 @@ export class CourseIncidentClient implements IncidentClient {
     for (const item of response.value.body.items) {
       const incident = decodeIncident(item);
       if (incident === null || seenIds.has(incident.id)) return this.contractFailure('list');
+      const actor = this.currentActor();
+      if (actor && incident.details !== null && !canReadIncident(actor, incident)) return fail('forbidden', 403);
       incidents.push(incident);
       seenIds.add(incident.id);
     }
@@ -149,6 +163,8 @@ export class CourseIncidentClient implements IncidentClient {
     if (response.value.status !== 200 || incident === null || incident.id !== incidentId) {
       return this.contractFailure('detail');
     }
+    const actor = this.currentActor();
+    if (actor && incident.details !== null && !canReadIncident(actor, incident)) return fail('forbidden', 403);
     return ok(incident);
   }
 
@@ -156,6 +172,9 @@ export class CourseIncidentClient implements IncidentClient {
     input: CreateIncidentInput,
     idempotencyKey: string,
   ): Promise<IncidentClientResult<CreatedIncident>> {
+    const actor = this.currentActor();
+    if (this.session && !actor) return fail('unauthorized', 401);
+    if (actor && !canCreateIncident(actor)) return fail('forbidden', 403);
     if (
       !isRecord(input) || !isCategory(input.category)
       || !isNonemptyString(input.description) || !isNonemptyString(input.location)
@@ -180,7 +199,50 @@ export class CourseIncidentClient implements IncidentClient {
       || (response.value.status === 201 && duplicate)
       || (response.value.status === 200 && !duplicate)
     ) return this.contractFailure('create');
+    if (actor && !canReadIncident(actor, incident)) return fail('forbidden', 403);
     return ok({ incident, operationId, duplicate });
+  }
+
+  public async applyAction(
+    incidentId: string,
+    input: IncidentActionInput,
+    idempotencyKey: string,
+  ): Promise<IncidentClientResult<CreatedIncident>> {
+    if (!isNonemptyString(incidentId) || !isRecord(input)
+      || !['start', 'resolve', 'close', 'reopen'].includes(input.action)
+      || !Number.isInteger(input.baseVersion) || input.baseVersion < 0
+      || !isNonemptyString(idempotencyKey) || idempotencyKey.length < 8
+      || (input.action === 'resolve' && !isNonemptyString(input.diagnosis))) return fail('invalid_input');
+
+    const actor = this.currentActor();
+    if (!actor) return fail('unauthorized', 401);
+    // Read the current assignment; the backend validates it again atomically on POST.
+    const detail = await this.getIncidentDetail(incidentId);
+    if (!detail.ok) return detail;
+    if (this.currentActor()?.id !== actor.id) return fail('unauthorized', 401);
+    if (!canPerformIncidentAction(actor, detail.value, input.action)) return fail('forbidden', 403);
+    // Version and transition checks are atomic on the backend. Sending the original
+    // version also lets it return an idempotent replay after a lost success response.
+    const body = JSON.stringify(input.action === 'resolve'
+      ? { action: input.action, baseVersion: input.baseVersion, diagnosis: input.diagnosis.trim() }
+      : { action: input.action, baseVersion: input.baseVersion });
+    const response = await this.request(`/v1/incidents/${encodeURIComponent(incidentId)}/actions`, 'POST', 'action', body, idempotencyKey);
+    if (!response.ok) return response;
+    if ((response.value.status !== 200 && response.value.status !== 201) || !isRecord(response.value.body)) {
+      return this.contractFailure('action');
+    }
+    const { incident: remote, operationId, duplicate } = response.value.body;
+    const incident = decodeIncident(remote);
+    if (incident === null || incident.id !== incidentId || operationId !== idempotencyKey
+      || typeof duplicate !== 'boolean'
+      || (response.value.status === 201 && duplicate) || (response.value.status === 200 && !duplicate)) {
+      return this.contractFailure('action');
+    }
+    return ok({ incident, operationId, duplicate });
+  }
+
+  private currentActor(): IncidentActor | null {
+    return this.session?.getSnapshot().actor ?? null;
   }
 
   private contractFailure<T>(operation: string): IncidentClientResult<T> {
@@ -195,10 +257,45 @@ export class CourseIncidentClient implements IncidentClient {
     body?: string,
     idempotencyKey?: string,
   ): Promise<IncidentClientResult<JsonResponse>> {
+    let credentials = this.session ? await this.session.getRequestCredentials() : null;
+    if (this.session && credentials === null) return fail('unauthorized', 401);
+    let result = await this.requestOnce(path, method, body, idempotencyKey, credentials);
+    if (this.session && credentials && !result.ok && result.error.status === 401) {
+      credentials = await this.session.coordinateRefresh(credentials);
+      if (credentials === null) return fail('unauthorized', 401);
+      result = await this.requestOnce(path, method, body, idempotencyKey, credentials);
+      if (!result.ok && result.error.status === 401) await this.session.invalidate(credentials);
+    }
+    if (this.session && credentials) {
+      const snapshot = this.session.getSnapshot();
+      if (snapshot.generation !== credentials.generation || snapshot.actor?.id !== credentials.actorId) {
+        return fail('unauthorized', 401);
+      }
+    }
+    if (!result.ok) {
+      logTelemetry('incident_client_error', { operation, kind: result.error.kind, status: result.error.status ?? null });
+    }
+    return result;
+  }
+
+  private async requestOnce(
+    path: string,
+    method: 'GET' | 'POST',
+    body?: string,
+    idempotencyKey?: string,
+    credentials?: RequestCredentials | null,
+  ): Promise<IncidentClientResult<JsonResponse>> {
+    if (this.session && credentials) {
+      const snapshot = this.session.getSnapshot();
+      if (snapshot.generation !== credentials.generation || snapshot.actor?.id !== credentials.actorId
+        || !['authenticated', 'expired', 'refreshing'].includes(snapshot.status)) {
+        return fail('unauthorized', 401);
+      }
+    }
     const controller = new AbortController();
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${this.accessToken}`,
-      'X-Course-Actor': this.actorId,
+      Authorization: `Bearer ${credentials?.accessToken ?? this.accessToken}`,
+      'X-Course-Actor': credentials?.actorId ?? this.actorId,
       'X-Course-Scenario': this.scenario,
     };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -233,13 +330,6 @@ export class CourseIncidentClient implements IncidentClient {
     });
     const result = await Promise.race([fetchAndDecode(), timeout]);
     if (timeoutId !== undefined) clearTimeout(timeoutId);
-    if (!result.ok) {
-      logTelemetry('incident_client_error', {
-        operation,
-        kind: result.error.kind,
-        status: result.error.status ?? null,
-      });
-    }
     return result;
   }
 }

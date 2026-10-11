@@ -1,6 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { CloudIncident } from '../../domain/incidents/CloudIncident';
+import type { IncidentActionInput } from '../../application/incidents/incidentAuthorization';
 
 type IncidentDetailScreenProps = Readonly<{
   incident: CloudIncident | null;
@@ -8,6 +10,9 @@ type IncidentDetailScreenProps = Readonly<{
   error: string | null;
   onBack: () => void;
   onRetry: () => void;
+  actions?: readonly IncidentActionInput['action'][];
+  isApplyingAction?: boolean;
+  onAction?: (action: IncidentActionInput['action'], diagnosis: string) => void;
 }>;
 
 export function IncidentDetailScreen({
@@ -16,7 +21,12 @@ export function IncidentDetailScreen({
   error,
   onBack,
   onRetry,
+  actions = [],
+  isApplyingAction = false,
+  onAction,
 }: IncidentDetailScreenProps) {
+  const [diagnosis, setDiagnosis] = useState('');
+  const labels = { start: 'Iniciar atención', resolve: 'Resolver incidencia', close: 'Cerrar incidencia', reopen: 'Reabrir incidencia' };
   return (
     <View style={styles.container}>
       <Pressable accessibilityRole="button" onPress={onBack}>
@@ -51,6 +61,17 @@ export function IncidentDetailScreen({
               <Text style={styles.description}>{incident.details.description}</Text>
             </>
           )}
+          {actions.includes('resolve') ? (
+            <TextInput accessibilityLabel="Diagnóstico de resolución" onChangeText={setDiagnosis}
+              placeholder="Diagnóstico" testID="incident-diagnosis-input" value={diagnosis} />
+          ) : null}
+          {actions.map((action) => (
+            <Pressable accessibilityRole="button" accessibilityState={{ disabled: isApplyingAction }}
+              disabled={isApplyingAction} key={action} onPress={() => onAction?.(action, diagnosis)}
+              style={styles.button} testID={`incident-action-${action}`}>
+              <Text style={styles.buttonText}>{labels[action]}</Text>
+            </Pressable>
+          ))}
         </View>
       ) : null}
     </View>
