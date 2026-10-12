@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 6,
-  "commitSha": "923baf2d11133e75bf1deabc828aff52e00a2f6e",
+  "commitSha": "37e752a2cde0620218c5722eab91f523d2fad066",
   "studentId": "3523110572",
   "decision": "La integración usa un único SessionManager compartido por la UI y CourseIncidentClient. coordinateRefresh evaluable delega al reducer real que utiliza el manager. Una promesa single-flight agrupa la renovación de las credenciales; cada solicitud reintenta como máximo una vez conservando cuerpo e Idempotency-Key. El actor y su perfil se obtienen del login validado, se comprueban permisos en el cliente y el backend conserva la validación final de asignación, versión y transición.",
   "alternatives": [
@@ -26,7 +26,7 @@
     {
       "command": "npm.cmd run typecheck; npm.cmd run lint",
       "result": "PASS: TypeScript sin errores; ESLint 0 errores.",
-      "evidence": "Se mantiene el stack y las pruebas anteriores. Un warning BOM pertenece a week-06-probe.test.ts preexistente local que no se incluye en esta aportación."
+      "evidence": "Se mantiene el stack y las pruebas anteriores. La verificación actual en main terminó sin errores de TypeScript ni errores o advertencias de ESLint."
     },
     {
       "command": "npm.cmd run backend:self-test",
