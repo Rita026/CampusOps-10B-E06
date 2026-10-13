@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 6,
-  "commitSha": "37e752a2cde0620218c5722eab91f523d2fad066",
+  "commitSha": "7c8bc890191358138e397718b0fc0571a59266fa",
   "studentId": "3523110572",
   "decision": "La integración usa un único SessionManager compartido por la UI y CourseIncidentClient. coordinateRefresh evaluable delega al reducer real que utiliza el manager. Una promesa single-flight agrupa la renovación de las credenciales; cada solicitud reintenta como máximo una vez conservando cuerpo e Idempotency-Key. El actor y su perfil se obtienen del login validado, se comprueban permisos en el cliente y el backend conserva la validación final de asignación, versión y transición.",
   "alternatives": [
