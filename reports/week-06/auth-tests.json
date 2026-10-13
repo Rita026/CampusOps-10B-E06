@@ -1,10 +1,18 @@
 {
   "schemaVersion": 1,
   "week": 6,
-  "commitSha": "37e752a2cde0620218c5722eab91f523d2fad066",
-  "generatedAt": "2026-10-12T00:52:07Z",
+  "commitSha": "70c3f8f8b2b1ef8ee2e1a7a4313a6472f6015939",
+  "generatedAt": "2026-10-12T19:20:55Z",
   "studentId": "3523110572",
   "checks": [
+
+    {
+      "id": "obsolete-login-storage-failure",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --runInBand course-tests/sessionManager.test.ts -t \"login save failure after logout starts\"",
+      "evidence": "La prueba de regresión reprodujo el defecto: el fallo de guardado se clasificaba incorrectamente como storage cuando logout ya había invalidado la generación. Después de la corrección, la prueba pasa y devuelve obsolete; la sesión permanece anonymous y el almacén queda vacío."
+    },
     {
       "id": "login-and-protected-ui",
       "status": "pass",

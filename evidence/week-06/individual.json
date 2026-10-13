@@ -54,15 +54,28 @@
       "explanation": "Conecté el inicio de sesión, los tokens de SecureStore y el cliente de incidencias mediante SessionManager. El adapter coordinateRefresh usa el mismo reducer que la sesión real. La generación evita renovar nuevamente un token anterior y descarta resultados de otra sesión; la cola serializa guardado y borrado para que logout deje el almacén vacío. Cada request usa como máximo un reintento y verifica generación antes de enviar y al recibir. Los permisos se validan en la lógica del cliente y otra vez en el backend; la UI refleja el perfil sin sustituir esos controles. El diagrama se actualizó para representar la implementación. Esta evidencia registra únicamente mi integración y conserva los registros de mis compañeros."
     },
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": [],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110600",
+      "commitShas": ["242255d2649415d0632584a4f566f3f1e4223b6f"],
+      "files": [
+        "src/application/session/SessionManager.ts",
+        "course-tests/sessionManager.test.ts",
+        "reports/week-06/auth-tests.json",
+        "reports/week-06/concurrency.json"
+      ],
+      "tests": [
+         "npm.cmd test -- --runInBand course-tests/sessionManager.test.ts -t \"login save failure after logout starts\"",
+         "npm.cmd test -- --runInBand course-tests/sessionManager.test.ts",
+         "npm.cmd test -- --runInBand course-tests/sessionManager.test.ts course-tests/sessionRefreshState.test.ts course-tests/public/week-06.test.ts course-tests/security-storage-errors.test.ts"
+      ],
+      "reviews": [
+        "Se revisó el manejo de login, logout, generación de sesión y guardado de credenciales.",
+        "Se agregó una prueba de regresión que reproduce el error de clasificación entre storage y obsolete.",
+        "Se verificó que la sesión termine en anonymous y que el almacén quede vacío."
+      ],
+      "prediction": "Si el guardado de credenciales falla después de que comienza logout, el resultado del login debe clasificarse como obsolete y no como storage.",
+      "command": "npm.cmd test -- --runInBand course-tests/sessionManager.test.ts -t \"login save failure after logout starts\"",
+      "observedResult": "PASS. La prueba de regresión pasa después de la corrección. La sesión permanece anonymous y el almacén queda vacío. Las cuatro suites relacionadas también pasan: 46 de 46 pruebas.",
+      "explanation": "Se corrigió la clasificación del fallo de guardado cuando logout invalida la generación del login. La corrección evita reportar como error de almacenamiento una operación que ya quedó obsoleta. Se agregó la prueba de regresión y se actualizaron los reportes de autenticación y concurrencia."
     }
   ]
 }

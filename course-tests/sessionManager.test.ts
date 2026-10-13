@@ -267,6 +267,32 @@ test('a second 401 invalidates its renewed credentials while a delayed older 401
   expect(context.store.value).toBeNull();
 });
 
+test('login save failure after logout starts is reported as obsolete', async () => {
+  const context = setup();
+  const saveStarted = deferred<void>();
+  const failSave = deferred<void>();
+
+  context.store.save.mockImplementationOnce(async () => {
+    saveStarted.resolve();
+    await failSave.promise;
+  });
+
+  const authenticate = context.session.login('technician-1');
+  await saveStarted.promise;
+
+  const logout = context.session.logout();
+  failSave.reject(new Error('synthetic-native-secret'));
+
+  await logout;
+
+  expect(await authenticate).toEqual({
+    ok: false,
+    error: { kind: 'obsolete' },
+  });
+  expect(context.session.getSnapshot().status).toBe('anonymous');
+  expect(context.store.value).toBeNull();
+});
+
 test('protected-storage save failure aborts login and clears any partial write', async () => {
   const context = setup();
   context.store.save.mockImplementationOnce(async (value) => {

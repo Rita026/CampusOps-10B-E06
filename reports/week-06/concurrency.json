@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "week": 6,
-  "commitSha": "37e752a2cde0620218c5722eab91f523d2fad066",
-  "generatedAt": "2026-10-12T00:52:07Z",
+  "commitSha": "70c3f8f8b2b1ef8ee2e1a7a4313a6472f6015939",
+  "generatedAt": "2026-10-12T19:20:55Z",
   "studentId": "3523110572",
   "refreshPolicy": {
     "singleFlight": true,
@@ -16,6 +16,14 @@
   "observedRetries": 3,
   "observedIncidentAttempts": 6,
   "checks": [
+
+    {
+      "id": "logout-during-login-save-failure",
+      "status": "pass",
+      "scenarioType": "failure",
+      "command": "npm.cmd test -- --runInBand course-tests/sessionManager.test.ts -t \"login save failure after logout starts\"",
+      "evidence": "Se controla la concurrencia entre login y logout mientras el guardado de credenciales está pendiente. El fallo tardío de guardado se clasifica como obsolete, logout termina y la sesión permanece anonymous con el almacén vacío."
+    },
     {
       "id": "three-real-http-401s",
       "status": "pass",
