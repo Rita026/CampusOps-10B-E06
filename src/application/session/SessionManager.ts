@@ -73,9 +73,18 @@ export class SessionManager implements SessionAccess {
         });
       });
     } catch {
-      if (this.isCurrent(generation)) await this.revoke(generation);
-      return { ok: false, error: { kind: this.isCurrent(generation + 1) ? 'storage' : 'obsolete' } };
+      const loginStillCurrent = this.isCurrent(generation);
+
+      if (loginStillCurrent) {
+        await this.revoke(generation);
+      }
+
+      return {
+        ok: false,
+        error: { kind: loginStillCurrent ? 'storage' : 'obsolete' },
+      };
     }
+
     if (!this.isCurrent(generation)) return { ok: false, error: { kind: 'obsolete' } };
     this.credentials = { accessToken: value.accessToken, refreshToken: value.refreshToken };
     this.expiresAt = this.clock.now() + value.expiresIn * 1000;
