@@ -4,15 +4,31 @@
   "teamId": "E06",
   "members": [
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": ["REEMPLAZAR"],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110444",
+      "commitShas": [
+        "4fb9ae6df3ececf3b1dc1f0df99d6547aa1fa7be",
+        "1f097179736105929f53dd605453b18f019b1f50"
+      ],
+      "files": [
+        "src/domain/sync/PendingOperation.ts",
+        "src/domain/sync/PendingOperationStore.ts",
+        "src/application/sync/PendingOperationQueue.ts",
+        "src/infrastructure/sync/JsonPendingOperationStore.ts",
+        "course-tests/pendingOperationQueue.test.ts",
+        "docs/data-model.md"
+      ],
+      "tests": [
+        "npm test -- --runInBand course-tests/pendingOperationQueue.test.ts",
+        "npm run typecheck"
+      ],
+      "reviews": [
+        "Se revisó que la cola no viva solo en memoria: una nueva instancia del store relee el mismo Map/AsyncStorage.",
+        "Se comprobó migración a schemaVersion 1 y rollback al fallar la escritura (backup restaurado)."
+      ],
+      "prediction": "Al encolar un start offline con operationId estable, una nueva instancia del store debe recuperar la misma operación. Una migración fallida no debe dejar schemaVersion nuevo a medias: debe restaurar el estado anterior.",
+      "command": "npm test -- --runInBand course-tests/pendingOperationQueue.test.ts",
+      "observedResult": "PASS. Test Suites: 1 passed; Tests: 5 passed. Reinicio simulado conserva operationId y contenido; duplicate operationId conserva la primera entrada; remove solo elimina el id indicado; migrateFromLegacy escribe schemaVersion 1; armFailNextSave restaura el estado previo (rollback).",
+      "explanation": "Implementé la cola persistente de operaciones offline con puerto PendingOperationStore e implementación JsonPendingOperationStore (AsyncStorage en app, Map en pruebas). Cada operación guarda operationId, incidentId, actorId, action, payload, baseVersion y createdAt. PendingOperationQueue evita duplicar el mismo operationId y solo remove cuando se confirma. La migración hace backup antes de escribir; si falla, restaura el backup. Documenté el modelo en docs/data-model.md. Typecheck pasó y las cinco pruebas de pendingOperationQueue.test.ts pasaron."
     },
     {
       "studentId": "REEMPLAZAR",
