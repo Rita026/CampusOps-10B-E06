@@ -43,6 +43,23 @@ export class PendingOperationQueue {
     });
   }
 
+  /**
+   * Sustituye una operación existente conservando su posición e identidad (rebase tras
+   * resolveSync). Devuelve false si ya no está en la cola, para no reenviar algo descartado.
+   */
+  public async replace(operation: PendingOperation): Promise<boolean> {
+    assertOperation(operation);
+    const state = await this.store.load();
+    if (!state.pendingOperations.some((item) => item.operationId === operation.operationId)) return false;
+    await this.store.save({
+      schemaVersion: 1,
+      pendingOperations: state.pendingOperations.map((item) => (
+        item.operationId === operation.operationId ? operation : item
+      )),
+    });
+    return true;
+  }
+
   public async remove(operationId: string): Promise<void> {
     if (!isNonemptyString(operationId)) throw new Error('operationId inválido');
     const state = await this.store.load();

@@ -12,5 +12,6 @@ export type PendingOperationStore = {
 export type PendingOperationQueuePort = {
   list(): Promise<readonly PendingOperation[]>;
   enqueue(operation: PendingOperation): Promise<void>;
+  replace(operation: PendingOperation): Promise<boolean>;
   remove(operationId: string): Promise<void>;
 };
