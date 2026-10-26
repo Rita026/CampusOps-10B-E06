@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "week": 8,
+  "commitSha": "a1ee5df3ade8022e4a3a2e9ad217f6bdb7927c4c",
+  "decision": "La sincronización combina por campo de primer nivel con tres vías (base, local, remoto) comparando JSON canónico: el lado que no cambió cede, el mismo cambio en ambos lados se acepta una vez y dos cambios distintos al mismo campo son conflicto, reportado en orden de nombre sin mutar entradas. work agrupa assignedTechnicianId y status, por lo que un inicio de atención offline y una reasignación remota son incompatibles: se declara conflicto, no se envía el start, no se sobrescribe la asignación remota y la intención permanece en la cola persistente. La idempotencia se apoya en un operationId estable que es la Idempotency-Key de cada envío (también desde la UI, que encola con la misma clave que ya envió ante network/timeout); la cola deduplica conservando la primera operación y sólo retira lo que el servidor confirma (201 o 200 duplicate).",
+  "alternatives": [
+    "Última escritura gana (local o remota): es simple, pero un técnico sin conexión podría imponer una asignación antigua o coordinación podría borrar en silencio la atención iniciada; viola el requisito de conservar ambos hechos.",
+    "Combinar assignedTechnicianId y status como campos separados: combinaría inicio local y reasignación remota, dejando la incidencia en atención por un técnico que ya no es el asignado; un estado inconsistente sin conflicto visible.",
+    "Generar una nueva clave en cada reintento o descartar la operación ante timeout/conflicto: evita guardar estado, pero una respuesta perdida duplicaría el efecto en el servidor o perdería la intención del técnico."
+  ],
+  "tradeoff": "Beneficio: no hay pérdida silenciosa (conflictos y errores dejan la operación en cola con su identidad) ni doble efecto (misma clave al reintentar, deduplicación y retiro sólo tras confirmación); los cambios independientes, como prioridad, se combinan y se rebasa baseVersion persistiendo el rebase antes de enviar. Costo: agrupar work declara conflicto aunque los subcampos difieran y exige una resolución explícita (coordinación devuelve la asignación o el técnico descarta su intención); sólo start y resolve tienen base derivable, por lo que comment, add_evidence, close y reopen quedan pendientes como unsupported_action; la sincronización se dispara al abrir sesión y con un botón, no al detectar la red, y la pantalla de resolución por operación queda para la semana 10.",
+  "requirementIds": [
+    "AC-02",
+    "AC-03",
+    "AC-04"
+  ],
+  "verification": [
+    {
+      "command": "npm test -- --ci --runInBand course-tests/public/week-08.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+      "result": "PASS: 4 suites, 23/23 pruebas.",
+      "evidence": "Contrato público (conflicto en work, combinación independiente, deduplicación); resolveSync con JSON canónico y sin mutación; backend real con reasignación offline que termina en conflict ['work'] con la cola intacta y technician-2 asignado, respuesta perdida reenviada con la misma clave y duplicate: true con un solo start; UI que encola con la clave enviada, sobrevive a un reinicio y aplica una sola vez, muestra el conflicto y no encola errores de servidor."
+    },
+    {
+      "command": "python tools/course_public_evaluator.py --week 8 --mode verify --execute-toolchain",
+      "result": "PASS: 10/10 checks (typecheck, lint, audit:ci, test:smoke, backend:self-test, secret_scan, workflow_integrity).",
+      "evidence": "Ejecutado en Windows sustituyendo npm por npm.cmd en memoria, sin modificar el evaluador. backend:self-test: 'roles, reassignment conflict, lost response, idempotency, evidence and geocoding PASS'."
+    },
+    {
+      "command": "npx jest --no-watchman --cacheDirectory <directorio vacío> --ci --runInBand course-tests/smoke.test.tsx",
+      "result": "Antes: FAIL por timeout (5263 ms y 5391 ms contra 5000 ms). Después de testTimeout 20000: PASS (4221 ms y 4090 ms).",
+      "evidence": "La falla dependía de la caché fría de Jest, como en la copia limpia del evaluador; con caché caliente ya pasaba. Se amplió el límite en la configuración de jest sin modificar ninguna aserción."
+    }
+  ],
+  "assistance": "Se utilizó asistencia de IA (ECC verification-loop y revisión de código) para auditar la rama, conectar la cola a la UI y redactar; los resultados registrados provienen de comandos ejecutados y revisados."
+}
