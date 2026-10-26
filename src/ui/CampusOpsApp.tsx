@@ -5,16 +5,17 @@ import { StatusBar } from 'expo-status-bar';
 import type { IncidentClient } from '../application/incidents/IncidentClient';
 import type { CheckBackendHealth } from '../application/system/checkBackendHealth';
 import type { SessionAccess } from '../application/session/SessionAccess';
-import { IncidentsApp } from './incidents/IncidentsApp';
+import { IncidentsApp, type OfflineSync } from './incidents/IncidentsApp';
 import { SessionPanel } from './SessionPanel';
 
 type CampusOpsAppProps = Readonly<{
   incidentClient: IncidentClient;
   checkBackendHealth: CheckBackendHealth;
   session: SessionAccess;
+  offlineSync?: OfflineSync;
 }>;
 
-export function CampusOpsApp({ incidentClient, checkBackendHealth, session }: CampusOpsAppProps) {
+export function CampusOpsApp({ incidentClient, checkBackendHealth, session, offlineSync }: CampusOpsAppProps) {
   const [status, setStatus] = useState<'checking' | 'available' | 'offline'>('checking');
   const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot);
 
@@ -37,7 +38,8 @@ export function CampusOpsApp({ incidentClient, checkBackendHealth, session }: Ca
       </View>
       <SessionPanel session={session} snapshot={snapshot} />
       {snapshot.actor !== null && ['authenticated', 'expired', 'refreshing'].includes(snapshot.status)
-        ? <IncidentsApp actor={snapshot.actor} client={incidentClient} key={snapshot.actor.id} /> : null}
+        ? <IncidentsApp actor={snapshot.actor} client={incidentClient} key={snapshot.actor.id} offlineSync={offlineSync} />
+        : null}
       <StatusBar style="auto" />
     </ScrollView>
   );

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type {
   CreateIncidentInput,
@@ -13,14 +13,38 @@ import {
   type IncidentActor,
   type IncidentActionInput,
 } from '../../application/incidents/incidentAuthorization';
+import { createPendingWorkOperation, type SyncOutcome } from '../../application/sync/IncidentSyncService';
 import type { CloudIncident } from '../../domain/incidents/CloudIncident';
+import type { PendingOperationQueuePort } from '../../domain/sync/PendingOperationStore';
 import { IncidentCreateScreen } from './IncidentCreateScreen';
 import { IncidentDetailScreen } from './IncidentDetailScreen';
 import { IncidentListScreen } from './IncidentListScreen';
 
-type IncidentsAppProps = Readonly<{ client: IncidentClient & Partial<IncidentActionClient>; actor?: IncidentActor }>;
+/** Persistent queue plus the service that replays it (docs/sync-policy.md). */
+export type OfflineSync = Readonly<{
+  queue: PendingOperationQueuePort;
+  synchronize: () => Promise<readonly SyncOutcome[]>;
+}>;
+
+type IncidentsAppProps = Readonly<{
+  client: IncidentClient & Partial<IncidentActionClient>;
+  actor?: IncidentActor;
+  offlineSync?: OfflineSync | undefined;
+}>;
 type Screen = 'list' | 'detail' | 'create';
 type CreateAttempt = Readonly<{ signature: string; key: string }>;
+
+/** Without a server answer the action may still be applied later with the same key. */
+const OFFLINE_ERRORS: ReadonlySet<IncidentClientErrorKind> = new Set(['network', 'timeout']);
+
+function describeSync(outcomes: readonly SyncOutcome[]): string {
+  const count = (kind: SyncOutcome['kind']) => outcomes.filter((outcome) => outcome.kind === kind).length;
+  const conflicts = count('conflict');
+  const summary = `Sincronización: ${count('confirmed')} confirmadas · ${count('pending')} pendientes · ${conflicts} en conflicto.`;
+  return conflicts > 0
+    ? `${summary} Coordinación cambió la incidencia; tu cambio se conserva en el dispositivo sin enviarse.`
+    : summary;
+}
 
 const ERROR_MESSAGES: Readonly<Record<IncidentClientErrorKind, string>> = {
   contract: 'La respuesta del servidor no cumple el contrato.',
@@ -43,7 +67,7 @@ function newOperationKey(): string {
   return `create-${Date.now().toString(36)}-${operationSequence.toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
 
-export function IncidentsApp({ client, actor }: IncidentsAppProps) {
+export function IncidentsApp({ client, actor, offlineSync }: IncidentsAppProps) {
   const [screen, setScreen] = useState<Screen>('list');
   const [incidents, setIncidents] = useState<readonly CloudIncident[]>([]);
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
@@ -61,6 +85,10 @@ export function IncidentsApp({ client, actor }: IncidentsAppProps) {
   const detailRequestId = useRef(0);
   const createInFlight = useRef(false);
   const createAttempt = useRef<CreateAttempt | null>(null);
+  const [syncNotice, setSyncNotice] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const syncInFlight = useRef(false);
+  const syncRequestId = useRef(0);
 
   const loadList = useCallback(async () => {
     const requestId = ++listRequestId.current;
@@ -113,6 +141,34 @@ export function IncidentsApp({ client, actor }: IncidentsAppProps) {
       listRequestId.current += 1;
     };
   }, [loadList]);
+
+  const runSync = useCallback(async () => {
+    if (!offlineSync || syncInFlight.current) return;
+    const requestId = ++syncRequestId.current;
+    syncInFlight.current = true;
+    setIsSyncing(true);
+    try {
+      const outcomes = await offlineSync.synchronize();
+      if (requestId !== syncRequestId.current) return;
+      if (outcomes.length > 0) setSyncNotice(describeSync(outcomes));
+      if (outcomes.some((outcome) => outcome.kind === 'confirmed')) void loadList();
+    } catch {
+      if (requestId !== syncRequestId.current) return;
+      setSyncNotice('No fue posible sincronizar los cambios pendientes. Siguen guardados en el dispositivo.');
+    } finally {
+      syncInFlight.current = false;
+      if (requestId === syncRequestId.current) setIsSyncing(false);
+    }
+  }, [loadList, offlineSync]);
+
+  // Mounting means a session just started or was restored after reopening the app.
+  useEffect(() => {
+    const timeoutId = setTimeout(() => { void runSync(); }, 0);
+    return () => {
+      clearTimeout(timeoutId);
+      syncRequestId.current += 1;
+    };
+  }, [runSync]);
 
   useEffect(() => {
     const timeoutId = screen === 'detail' && selectedIncidentId !== null
@@ -190,12 +246,29 @@ export function IncidentsApp({ client, actor }: IncidentsAppProps) {
     if (actionAttempt.current?.signature !== signature) {
       actionAttempt.current = { signature, key: newOperationKey() };
     }
+    const operationKey = actionAttempt.current.key;
     try {
-      const result = await client.applyAction(selectedIncident.id, input, actionAttempt.current.key);
+      const result = await client.applyAction(selectedIncident.id, input, operationKey);
       if (result.ok) {
         actionAttempt.current = null;
         setSelectedIncident(result.value.incident);
+        // The server confirmed this key: an earlier offline copy must not be replayed. If the
+        // removal fails, the next sync replays the same key and the backend answers duplicate.
+        if (offlineSync) await offlineSync.queue.remove(operationKey).catch(() => undefined);
         void loadList();
+      } else if (offlineSync && OFFLINE_ERRORS.has(result.error.kind) && (action === 'start' || action === 'resolve')) {
+        // Same identity that was just sent: if the request did reach the server, the
+        // replay is recognised as a duplicate instead of applying the effect twice.
+        const operation = createPendingWorkOperation({
+          actor, incident: selectedIncident, action, operationId: operationKey,
+          createdAt: new Date().toISOString(), diagnosis,
+        });
+        if (operation === null) {
+          setDetailError(ERROR_MESSAGES[result.error.kind]);
+        } else {
+          await offlineSync.queue.enqueue(operation);
+          setSyncNotice('Sin conexión: el cambio quedó guardado en este dispositivo y se enviará al sincronizar.');
+        }
       } else {
         setDetailError(ERROR_MESSAGES[result.error.kind]);
       }
@@ -207,9 +280,24 @@ export function IncidentsApp({ client, actor }: IncidentsAppProps) {
     }
   };
 
+  const syncBanner = offlineSync ? (
+    <View accessibilityRole="summary" style={styles.syncBanner}>
+      {syncNotice !== null ? <Text testID="sync-notice">{syncNotice}</Text> : null}
+      <Pressable
+        accessibilityRole="button"
+        disabled={isSyncing}
+        onPress={() => void runSync()}
+        testID="sync-pending"
+      >
+        <Text>{isSyncing ? 'Sincronizando…' : 'Sincronizar pendientes'}</Text>
+      </Pressable>
+    </View>
+  ) : null;
+
   if (screen === 'detail' && selectedIncidentId !== null) {
     return (
       <View style={styles.section}>
+        {syncBanner}
         <IncidentDetailScreen
           actions={actor && selectedIncident && client.applyAction
             ? (['start', 'resolve', 'close', 'reopen'] as const).filter((action) =>
@@ -247,6 +335,7 @@ export function IncidentsApp({ client, actor }: IncidentsAppProps) {
 
   return (
     <View style={styles.section}>
+      {syncBanner}
       <IncidentListScreen
         canCreate={actor === undefined || actor.role === 'reporter'}
         error={listError}
@@ -260,4 +349,4 @@ export function IncidentsApp({ client, actor }: IncidentsAppProps) {
   );
 }
 
-const styles = StyleSheet.create({ section: { gap: 12 } });
+const styles = StyleSheet.create({ section: { gap: 12 }, syncBanner: { gap: 8 } });

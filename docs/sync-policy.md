@@ -13,6 +13,7 @@ Este documento describe cómo la app combina cambios hechos sin conexión con el
 | `PendingOperationQueue.replace` | `src/application/sync/PendingOperationQueue.ts` | Persiste un rebase conservando posición e identidad. |
 | Adaptadores `resolveSync` / `deduplicateOperations` | `src/course-evaluation/index.ts` | Delegan en las dos funciones anteriores; no hay una implementación aparte para las pruebas. |
 | Composición | `src/bootstrap/campusOpsServices.ts` | `incidentSync` usa la cola en AsyncStorage, el cliente real y el actor de la sesión. |
+| Flujo en la app | `src/ui/incidents/IncidentsApp.tsx` (recibe `offlineSync` desde `App.tsx`) | Encola `start`/`resolve` ante `network`/`timeout`, sincroniza al abrir la sesión y con el botón "Sincronizar pendientes", y muestra el resultado. |
 
 ## 1. Identidad estable
 
@@ -53,7 +54,7 @@ Se compara cada campo de primer nivel de `fields` entre la base común, la versi
 
 ### Cómo se informa y se resuelve
 
-- `synchronize()` devuelve un `SyncOutcome` por operación. Para este caso es `conflict` con `fields: ['work']`; la UI (semana 10) lo muestra como cambio en conflicto, separado de "pendiente por red".
+- `synchronize()` devuelve un `SyncOutcome` por operación. Para este caso es `conflict` con `fields: ['work']`. `IncidentsApp` muestra el resumen (`sync-notice`) con confirmadas, pendientes y en conflicto por separado, y avisa que el cambio se conserva en el dispositivo sin enviarse. La pantalla detallada por operación queda para la semana 10.
 - Resoluciones válidas:
   1. **Coordinación devuelve la asignación al técnico.** En la siguiente sincronización `work` remoto vuelve a ser igual a la base, `resolveSync` combina y la operación se rebasa (ver §5) y se confirma. Lo cubre la prueba "when coordination assigns the incident back…".
   2. **El técnico descarta su intención** con una acción explícita (`pendingOperations.remove(operationId)`). Nunca se descarta de forma automática.
@@ -71,6 +72,13 @@ Se compara cada campo de primer nivel de `fields` entre la base común, la versi
 - **Cambios independientes:** si `work` remoto sigue igual a la base pero la versión avanzó (por ejemplo, cambió la prioridad), se rebasa `baseVersion` a la versión remota. El rebase se **persiste en la cola antes de enviar** (`PendingOperationQueue.replace`), así cada reintento posterior manda exactamente el contenido que el servidor pudo haber guardado con esa clave. El backend sólo registra la huella de operaciones exitosas, así que el rebase no reutiliza una clave con contenido distinto ya aplicado; si eso pasara, el 409 `idempotency_key_reused` deja la operación en cola.
 - **Orden:** si una operación de una incidencia no se confirma, las siguientes de esa misma incidencia quedan `pending` con `waiting_previous`. Un `resolve` no se envía antes que su `start`.
 - **Errores de red/servidor** (`timeout`, `network`, `server`, `rate_limited`, `unauthorized`, `contract`, 409 tras el POST): la operación queda `pending` con la razón. La política de espera entre reintentos es de la semana 9 (`planRetry`).
+
+### Desde la app
+
+- Si `applyAction` de `start` o `resolve` termina en `network` o `timeout`, `IncidentsApp` guarda la intención con `createPendingWorkOperation` usando **la misma `operationId` que ya envió como `Idempotency-Key`**. Si la petición sí llegó al servidor, el reenvío se reconoce como `duplicate` en vez de aplicar el efecto dos veces.
+- Otros errores (`server`, `forbidden`, `conflict`…) se muestran y no se encolan: no son falta de conexión.
+- Si el técnico reintenta en línea y el servidor confirma esa clave, la copia encolada se retira para que no se reenvíe después de acciones posteriores.
+- Al montar `IncidentsApp` (inicio de sesión o sesión restaurada al reabrir la app) se ejecuta `synchronize()`; el botón "Sincronizar pendientes" permite repetirlo.
 
 ## 6. Cuándo se retira una operación de la cola
 
@@ -96,6 +104,7 @@ Un timeout no prueba que el servidor no ejecutó la operación, por eso nunca au
 | Falla del servidor y orden por incidencia | misma suite | misma | PASS: `pending/server` y `pending/waiting_previous`; ambas siguen en cola y luego se confirman en orden. |
 | Autorización por autor y sin sesión | misma suite | misma | PASS: sin peticiones HTTP con la sesión de `technician-2`, cola intacta. |
 | Conflicto calculado por `resolveSync` cuando el remoto es legible | misma suite (cliente controlado) | misma | PASS: `conflict` en `['work']` sin llamar a `applyAction`. |
+| Flujo en la app: inicio sin conexión encolado con su clave, reinicio y un solo envío al reconectar; conflicto visible con la cola intacta; reintento en línea que retira la copia; error de servidor no encolado | `course-tests/incidentsAppOfflineSync.test.tsx` | `npm test -- --runInBand course-tests/incidentsAppOfflineSync.test.tsx` | PASS, 4/4 pruebas. |
 
 Las dos suites nuevas juntas: 16/16 pruebas en PASS. `npm run typecheck` y `npm run lint` terminan sin errores.
 
@@ -103,4 +112,5 @@ Las dos suites nuevas juntas: 16/16 pruebas en PASS. `npm run typecheck` y `npm 
 
 - Por ahora sólo `start` y `resolve` tienen base de `work` derivable; `comment`, `add_evidence`, `close` y `reopen` se quedan en cola como `pending/unsupported_action` hasta que el cliente las soporte. No se pierden.
 - Si el efecto local ya existe en el servidor pero lo aplicó otra operación (otra clave), el reenvío recibe 409 y la operación queda pendiente hasta que el usuario la descarte.
-- El conflicto todavía no se guarda como estado propio en la cola: se recalcula en cada sincronización a partir del servidor. La presentación en pantalla corresponde a la semana 10.
+- El conflicto todavía no se guarda como estado propio en la cola: se recalcula en cada sincronización a partir del servidor. La app muestra el resumen; la pantalla de resolución por operación corresponde a la semana 10.
+- La sincronización se dispara al abrir la sesión y con el botón; todavía no se detecta automáticamente el regreso de la red (la política de reintentos con espera es de la semana 9).
