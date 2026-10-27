@@ -8,6 +8,7 @@ import type {
 } from './contracts';
 import type { IncidentLocation } from '../campusops/contracts';
 import { reduceRefreshEvents, type RefreshSummary } from '../application/session/refreshState';
+import { deduplicateByOperationId, resolveSyncRecords } from '../application/sync/syncResolution';
 
 function pending(name: string): never {
   throw new Error(`${name} must be implemented in the assigned week`);
@@ -75,18 +76,19 @@ export function coordinateRefresh(events: readonly AuthEvent[]): RefreshSummary 
   return reduceRefreshEvents(events);
 }
 
+/** Same policy IncidentSyncService applies to the persistent queue (docs/sync-policy.md). */
 export function resolveSync(
-  _base: SyncRecord,
-  _local: SyncRecord,
-  _remote: SyncRecord,
+  base: SyncRecord,
+  local: SyncRecord,
+  remote: SyncRecord,
 ): Readonly<{ kind: 'merged'; fields: JsonObject } | { kind: 'conflict'; fields: readonly string[] }> {
-  return pending('resolveSync');
+  return resolveSyncRecords(base, local, remote);
 }
 
 export function deduplicateOperations<T extends Readonly<{ operationId: string }>>(
-  _operations: readonly T[],
+  operations: readonly T[],
 ): readonly T[] {
-  return pending('deduplicateOperations');
+  return deduplicateByOperationId(operations);
 }
 
 export function planRetry(_input: Readonly<{

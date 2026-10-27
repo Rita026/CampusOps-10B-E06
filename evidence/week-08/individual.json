@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "week": 8,
+  "teamId": "E06",
+  "members": [
+    {
+      "studentId": "3523110444",
+      "commitShas": [
+        "4fb9ae6df3ececf3b1dc1f0df99d6547aa1fa7be",
+        "1f097179736105929f53dd605453b18f019b1f50"
+      ],
+      "files": [
+        "src/domain/sync/PendingOperation.ts",
+        "src/domain/sync/PendingOperationStore.ts",
+        "src/application/sync/PendingOperationQueue.ts",
+        "src/infrastructure/sync/JsonPendingOperationStore.ts",
+        "course-tests/pendingOperationQueue.test.ts",
+        "docs/data-model.md"
+      ],
+      "tests": [
+        "npm test -- --runInBand course-tests/pendingOperationQueue.test.ts",
+        "npm run typecheck"
+      ],
+      "reviews": [
+        "Se revisó que la cola no viva solo en memoria: una nueva instancia del store relee el mismo Map/AsyncStorage.",
+        "Se comprobó migración a schemaVersion 1 y rollback al fallar la escritura (backup restaurado)."
+      ],
+      "prediction": "Al encolar un start offline con operationId estable, una nueva instancia del store debe recuperar la misma operación. Una migración fallida no debe dejar schemaVersion nuevo a medias: debe restaurar el estado anterior.",
+      "command": "npm test -- --runInBand course-tests/pendingOperationQueue.test.ts",
+      "observedResult": "PASS. Test Suites: 1 passed; Tests: 5 passed. Reinicio simulado conserva operationId y contenido; duplicate operationId conserva la primera entrada; remove solo elimina el id indicado; migrateFromLegacy escribe schemaVersion 1; armFailNextSave restaura el estado previo (rollback).",
+      "explanation": "Implementé la cola persistente de operaciones offline con puerto PendingOperationStore e implementación JsonPendingOperationStore (AsyncStorage en app, Map en pruebas). Cada operación guarda operationId, incidentId, actorId, action, payload, baseVersion y createdAt. PendingOperationQueue evita duplicar el mismo operationId y solo remove cuando se confirma. La migración hace backup antes de escribir; si falla, restaura el backup. Documenté el modelo en docs/data-model.md. Typecheck pasó y las cinco pruebas de pendingOperationQueue.test.ts pasaron."
+    },
+    {
+      "studentId": "3523110572",
+      "commitShas": [
+        "1fec2cbe334713851af52fe08040f81e7b8f3fa7",
+        "4ffe495a442652ac28e671c93b52d0e86f726498",
+        "2ba6a54c28d9dacfd0047056e9f894b82d593710",
+        "a1ee5df3ade8022e4a3a2e9ad217f6bdb7927c4c"
+      ],
+      "files": [
+        "src/application/sync/syncResolution.ts",
+        "src/application/sync/IncidentSyncService.ts",
+        "src/application/sync/PendingOperationQueue.ts",
+        "src/domain/sync/PendingOperationStore.ts",
+        "src/course-evaluation/index.ts",
+        "src/bootstrap/campusOpsServices.ts",
+        "course-tests/syncResolution.test.ts",
+        "course-tests/incidentSync.integration.test.ts",
+        "docs/sync-policy.md",
+        "src/ui/incidents/IncidentsApp.tsx",
+        "src/ui/CampusOpsApp.tsx",
+        "App.tsx",
+        "course-tests/incidentsAppOfflineSync.test.tsx",
+        "package.json",
+        "evidence/week-08/engineering.json"
+      ],
+      "tests": [
+        "npm test -- --runInBand course-tests/public/week-08.test.ts",
+        "npm test -- --runInBand course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts",
+        "npm test -- --runInBand course-tests/pendingOperationQueue.test.ts",
+        "npm test -- --runInBand course-tests/incidentsAppOfflineSync.test.tsx",
+        "python tools/course_public_evaluator.py --week 8 --mode verify --execute-toolchain",
+        "npm run typecheck",
+        "npm run lint"
+      ],
+      "reviews": [
+        "Revisé e implementé resolveSync y deduplicateOperations en src/course-evaluation/index.ts; ambos delegan en src/application/sync/syncResolution.ts, la misma lógica que usa IncidentSyncService con la cola persistente real.",
+        "Revisé e implementé el caso técnico inicia sin conexión + coordinación reasigna: comprobé contra el backend del curso que se declara conflicto en work, que la cola conserva la misma operación tras reiniciar y volver a sincronizar, y que la asignación a technician-2 no se sobrescribe.",
+        "Revisé que las pruebas detecten regresiones: al hacer que el conflicto borrara la cola fallaron 2 pruebas de integración, y al rebasar una operación ya aplicada falló la prueba de respuesta perdida; después restauré el código.",
+        "Asistencia material de IA en la implementación y redacción; revisé el código y la política, y verifiqué el resultado ejecutando las pruebas, typecheck y lint.",
+        "Con apoyo de IA (ECC verification-loop) audité la rama: IncidentSyncService no se usaba desde la UI y smoke.test.tsx fallaba por timeout con caché de Jest vacía (5263 ms contra 5000 ms). Conecté la cola a IncidentsApp con la misma operationId enviada, amplié testTimeout sin tocar aserciones y registré la decisión en evidence/week-08/engineering.json."
+      ],
+      "prediction": "Esperaba que el inicio offline de technician-1 frente a una reasignación remota a technician-2 se reportara como conflicto en ['work'] sin mutar los registros, que los cambios independientes (por ejemplo prioridad) se combinaran y que un operationId repetido conservara la primera operación. En la app esperaba que la cola conservara la intención después del conflicto y que sólo una confirmación del servidor la retirara.",
+      "command": "npm test -- --runInBand course-tests/public/week-08.test.ts",
+      "observedResult": "PASS. Test Suites: 1 passed; Tests: 3 passed (antes de implementar fallaban las 3 con 'must be implemented in the assigned week'). Junto con course-tests/syncResolution.test.ts, course-tests/incidentSync.integration.test.ts y course-tests/pendingOperationQueue.test.ts: 4 suites, 24/24 pruebas en PASS. Contra el backend real: conflicto ['work'] con la cola intacta y el remoto asignado a technician-2 sin start en el historial; al reasignar de vuelta a technician-1 se confirma un solo start; tras timeout_after_commit el reenvío con la misma clave devuelve duplicate: true y hay un solo start. typecheck y lint sin errores. En la app (course-tests/incidentsAppOfflineSync.test.tsx, 4/4 PASS) un start sin red queda en la cola con la misma clave que se envió, tras reabrir se aplica una sola vez y la cola queda vacía; una reasignación se muestra como conflicto con la cola intacta. El evaluador en modo verify con toolchain pasó 10/10 checks y el smoke test con caché fría pasó en 4221 ms.",
+      "explanation": "Implementé y revisé resolveSync como combinación de tres vías por campo: comparo base, local y remoto con JSON canónico (claves ordenadas); el lado que no cambió cede al que cambió, el mismo cambio en ambos lados se acepta una vez y cambios distintos en el mismo campo se reportan como conflicto en orden de nombre, sin mutar las entradas. work agrupa asignado y estado, por eso un inicio local y una reasignación remota son incompatibles. deduplicateOperations conserva la primera operación de cada operationId. IncidentSyncService reconstruye la base de work desde la precondición de la acción (sólo se encola start si el técnico era el asignado), consulta el remoto y, ante un 403 por la autorización de la semana 6 o un conflicto de resolveSync, devuelve conflict sin enviar el start ni borrar la cola. Sólo retira operaciones confirmadas; si el remoto ya muestra el efecto, reenvía el mismo contenido y el servidor responde duplicate. Documenté reglas, autorización, reintentos y retiro de la cola en docs/sync-policy.md."
+    },
+    {
+      "studentId": "3523110600",
+      "commitShas": [
+        "4b80ccae1bace7fa14a2f46d9afe7a61ed60ff3d"
+      ],
+      "files": [
+        "reports/week-08/migration-tests.json",
+        "evidence/week-08/individual.json"
+      ],
+      "tests": [
+        "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx"
+      ],
+      "reviews": [
+        "Documenté los escenarios de reinicio, migración exitosa, rollback ante fallo de migración, conflicto de reasignación, combinación de cambios independientes y de duplicación.",
+        "Revisé que el reporte incluyera los resultados de las pruebas ejecutadas y conservé la decisión técnica de sincronización integrada por el equipo."
+      ],
+      "prediction": "Esperaba que la cola persistente conservara las operaciones después de reiniciar, que una migración fallida restaurara el estado anterior, que los cambios incompatibles generaran un conflicto sin perder la operación pendiente y que los cambios independientes pudieran combinarse. También esperaba que repetir un operationId no produjera efectos duplicados.",
+      "command": "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+      "observedResult": "PASS: 5 suites aprobadas y 28 pruebas aprobadas, sin fallos. El reporte registra seis escenarios: reinicio de la cola, migración exitosa, rollback de migración fallida, conflicto de reasignación, combinación de cambios independientes y deduplicación de operaciones.",
+      "explanation": "Preparé el reporte reports/week-08/migration-tests.json a partir de las pruebas ejecutadas localmente. Documenté los comandos y resultados de los seis escenarios solicitados. Revisé la evidencia técnica compartida por el equipo y mantuve la decisión de sincronización integrada por mi compañero. Utilicé ChatGPT como apoyo para organizar y revisar la documentación; ejecuté las pruebas en el repositorio local."
+    }
+  ]
+}
