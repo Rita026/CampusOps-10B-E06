@@ -77,15 +77,25 @@
       "explanation": "Implementé y revisé resolveSync como combinación de tres vías por campo: comparo base, local y remoto con JSON canónico (claves ordenadas); el lado que no cambió cede al que cambió, el mismo cambio en ambos lados se acepta una vez y cambios distintos en el mismo campo se reportan como conflicto en orden de nombre, sin mutar las entradas. work agrupa asignado y estado, por eso un inicio local y una reasignación remota son incompatibles. deduplicateOperations conserva la primera operación de cada operationId. IncidentSyncService reconstruye la base de work desde la precondición de la acción (sólo se encola start si el técnico era el asignado), consulta el remoto y, ante un 403 por la autorización de la semana 6 o un conflicto de resolveSync, devuelve conflict sin enviar el start ni borrar la cola. Sólo retira operaciones confirmadas; si el remoto ya muestra el efecto, reenvía el mismo contenido y el servidor responde duplicate. Documenté reglas, autorización, reintentos y retiro de la cola en docs/sync-policy.md."
     },
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": ["REEMPLAZAR"],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "studentId": "3523110600",
+      "commitShas": [
+        "4b80ccae1bace7fa14a2f46d9afe7a61ed60ff3d"
+      ],
+      "files": [
+        "reports/week-08/migration-tests.json",
+        "evidence/week-08/individual.json"
+      ],
+      "tests": [
+        "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx"
+      ],
+      "reviews": [
+        "Documenté los escenarios de reinicio, migración exitosa, rollback ante fallo de migración, conflicto de reasignación, combinación de cambios independientes y de duplicación.",
+        "Revisé que el reporte incluyera los resultados de las pruebas ejecutadas y conservé la decisión técnica de sincronización integrada por el equipo."
+      ],
+      "prediction": "Esperaba que la cola persistente conservara las operaciones después de reiniciar, que una migración fallida restaurara el estado anterior, que los cambios incompatibles generaran un conflicto sin perder la operación pendiente y que los cambios independientes pudieran combinarse. También esperaba que repetir un operationId no produjera efectos duplicados.",
+      "command": "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+      "observedResult": "PASS: 5 suites aprobadas y 28 pruebas aprobadas, sin fallos. El reporte registra seis escenarios: reinicio de la cola, migración exitosa, rollback de migración fallida, conflicto de reasignación, combinación de cambios independientes y deduplicación de operaciones.",
+      "explanation": "Preparé el reporte reports/week-08/migration-tests.json a partir de las pruebas ejecutadas localmente. Documenté los comandos y resultados de los seis escenarios solicitados. Revisé la evidencia técnica compartida por el equipo y mantuve la decisión de sincronización integrada por mi compañero. Utilicé ChatGPT como apoyo para organizar y revisar la documentación; ejecuté las pruebas en el repositorio local."
     }
   ]
 }
