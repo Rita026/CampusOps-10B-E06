@@ -1,50 +1,52 @@
-﻿{
+{
     "schemaVersion":  1,
     "week":  8,
-    "commitSha":  "d2e424150aa3ce89ffaac5aa6f52309e06e24f98",
+    "commitSha":  "7630dfa2e4d82a0b932788844fa4b4e0652a8cb9",
     "generatedAt":  "2026-10-27T03:21:24Z",
     "checks":  [
-                   {
-                       "scenarioType":  "nominal",
-                       "status":  "pass",
-                       "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
-                       "id":  "restart-queue",
-                       "evidence":  "PASS: enqueue and list survive a new store instance (simulated restart), en course-tests/pendingOperationQueue.test.ts."
-                   },
-                   {
-                       "scenarioType":  "nominal",
-                       "status":  "pass",
-                       "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
-                       "id":  "migration-valid",
-                       "evidence":  "PASS: migration writes schema v1 and keeps pending operations, en course-tests/pendingOperationQueue.test.ts."
-                   },
-                   {
-                       "scenarioType":  "failure",
-                       "status":  "pass",
-                       "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
-                       "id":  "migration-failure-rollback",
-                       "evidence":  "PASS: antes del fallo se guarda schemaVersion 1 con operationId op-already-there-1234; se provoca synthetic-migration-failure; despues load() devuelve el estado previo y conserva ese operationId."
-                   },
-                   {
-                       "scenarioType":  "failure",
-                       "status":  "pass",
-                       "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
-                       "id":  "reassignment-conflict",
-                       "evidence":  "PASS: offline start versus remote reassignment is a conflict that keeps the queue and the new assignment; tambien se prueba resolveSync sobre work."
-                   },
-                   {
-                       "scenarioType":  "nominal",
-                       "status":  "pass",
-                       "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
-                       "id":  "independent-merge",
-                       "evidence":  "PASS: an independent remote change (priority) is combined with the offline start; la prueba publica tambien confirma la combinacion de campos independientes."
-                   },
-                   {
-                       "scenarioType":  "boundary",
-                       "status":  "pass",
-                       "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
-                       "id":  "duplicate-operation",
-                       "evidence":  "PASS: duplicate operationId keeps the first entry; replay con la misma identidad produce un solo efecto."
-                   }
-               ]
+        {
+            "scenarioType":  "nominal",
+            "status":  "pass",
+            "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+            "id":  "restart-queue",
+            "evidence":  "PASS: enqueue and list survive a new store instance (simulated restart), en course-tests/pendingOperationQueue.test.ts."
+        },
+        {
+            "scenarioType":  "nominal",
+            "status":  "pass",
+            "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+            "id":  "migration-valid",
+            "evidence":  "PASS: migration writes schema v1 and keeps pending operations, en course-tests/pendingOperationQueue.test.ts."
+        },
+        {
+            "scenarioType":  "failure",
+            "status":  "pass",
+            "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+            "id":  "migration-failure-rollback",
+            "evidence":  "PASS: antes del fallo se guarda schemaVersion 1 con operationId op-already-there-1234; se provoca synthetic-migration-failure; despues load() devuelve el estado previo y conserva ese operationId."
+        },
+        {
+            "scenarioType":  "failure",
+            "status":  "pass",
+            "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+            "id":  "reassignment-conflict",
+            "evidence":  "PASS: offline start versus remote reassignment is a conflict that keeps the queue and the new assignment; tambien se prueba resolveSync sobre work."
+        },
+        {
+            "scenarioType":  "nominal",
+            "status":  "pass",
+            "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+            "id":  "independent-merge",
+            "evidence":  "PASS: an independent remote change (priority) is combined with the offline start; la prueba publica tambien confirma la combinacion de campos independientes."
+        },
+        {
+            "scenarioType":  "boundary",
+            "status":  "pass",
+            "command":  "npm.cmd test -- --runInBand course-tests/pendingOperationQueue.test.ts course-tests/syncResolution.test.ts course-tests/incidentSync.integration.test.ts course-tests/public/week-08.test.ts course-tests/incidentsAppOfflineSync.test.tsx",
+            "id":  "duplicate-operation",
+            "evidence":  "PASS: duplicate operationId keeps the first entry; replay con la misma identidad produce un solo efecto."
+        }
+    ]
 }
+
+                   
