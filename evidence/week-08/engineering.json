@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": 8,
-  "commitSha": "7630dfa2e4d82a0b932788844fa4b4e0652a8cb9",
+  "commitSha": "54e1e95c19985615266218b174dc5459bc01bbdf",
   "decision": "La sincronización combina por campo de primer nivel con tres vías (base, local, remoto) comparando JSON canónico: el lado que no cambió cede, el mismo cambio en ambos lados se acepta una vez y dos cambios distintos al mismo campo son conflicto, reportado en orden de nombre sin mutar entradas. work agrupa assignedTechnicianId y status, por lo que un inicio de atención offline y una reasignación remota son incompatibles: se declara conflicto, no se envía el start, no se sobrescribe la asignación remota y la intención permanece en la cola persistente. La idempotencia se apoya en un operationId estable que es la Idempotency-Key de cada envío (también desde la UI, que encola con la misma clave que ya envió ante network/timeout); la cola deduplica conservando la primera operación y sólo retira lo que el servidor confirma (201 o 200 duplicate).",
   "alternatives": [
     "Última escritura gana (local o remota): es simple, pero un técnico sin conexión podría imponer una asignación antigua o coordinación podría borrar en silencio la atención iniciada; viola el requisito de conservar ambos hechos.",
