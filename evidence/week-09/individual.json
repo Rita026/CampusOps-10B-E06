@@ -1,10 +1,40 @@
 {
   "schemaVersion": 1,
-  "week": 8,
+  "week": 9,
   "teamId": "E06",
   "members": [
     {
-      "studentId": "REEMPLAZAR",
+      "studentId": "3523110444",
+      "commitShas": [
+        "f812b5d6c1fe9614603f2cf324de3fa85560368a",
+        "70b30c122253699862c4c0974e27735b247f1209"
+      ],
+      "files": [
+        "src/application/location/selectIncidentLocation.ts",
+        "src/domain/location/GeocodingGateway.ts",
+        "src/infrastructure/location/CourseGeocodingGateway.ts",
+        "src/infrastructure/location/CachedGeocodingGateway.ts",
+        "src/course-evaluation/index.ts",
+        "course-tests/selectIncidentLocation.test.ts",
+        ".github/workflows/week-09-integracion-resiliente-feedback.yml",
+        "evidence/week-09/individual.json"
+      ],
+      "tests": [
+        "npm test -- --runInBand course-tests/selectIncidentLocation.test.ts",
+        "npm test -- --runInBand course-tests/public/week-09.test.ts -t geocoding",
+        "npm run typecheck"
+      ],
+      "reviews": [
+        "Se revisó que un proveedor con label y coordenadas válidas produzca source provider y que null, 429, datos incompletos o coordenadas fuera de rango caigan a ubicación manual sin inventar lat/lng.",
+        "Se comprobó que el adaptador use el doble del backend GET /v1/geocoding y que la caché solo almacene resultados ok."
+      ],
+      "prediction": "Con label y coordenadas en rango esperaba source provider. Con null, error 429, label sin coordenadas o latitude 91 esperaba source manual con el label escrito por el usuario, sin fabricar coordenadas.",
+      "command": "npm test -- --runInBand course-tests/public/week-09.test.ts -t geocoding",
+      "observedResult": "PASS. CampusOps accepts valid geocoding and otherwise keeps manual incident location. selectIncidentLocation.test.ts: 2/2 PASS. typecheck sin errores. Los tres tests de planRetry siguen pendientes (otra integrante/integrante).",
+      "explanation": "Implementé selectIncidentLocation en application/location y la conecté en course-evaluation. Solo acepta un objeto con label no vacío y latitude/longitude finitos en rango; en cualquier otro caso devuelve source manual con el texto del usuario. CourseGeocodingGateway consulta el doble didáctico GET /v1/geocoding con escenarios controlados; CachedGeocodingGateway guarda solo resultados exitosos por query. Integré la plantilla de la semana 9 (workflow con tags, assignments, evidence). No implementé planRetry: corresponde a otro integrante."
+    },
+    {
+      "studentId": "3523110572",
       "commitShas": ["REEMPLAZAR"],
       "files": ["REEMPLAZAR"],
       "tests": ["REEMPLAZAR"],
@@ -15,18 +45,7 @@
       "explanation": "REEMPLAZAR"
     },
     {
-      "studentId": "REEMPLAZAR",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": ["REEMPLAZAR"],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
-    },
-    {
-      "studentId": "REEMPLAZAR",
+      "studentId": "3523110600",
       "commitShas": ["REEMPLAZAR"],
       "files": ["REEMPLAZAR"],
       "tests": ["REEMPLAZAR"],
