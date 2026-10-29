@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "week": 8,
+  "teamId": "E06",
+  "members": [
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": ["REEMPLAZAR"],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    },
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": ["REEMPLAZAR"],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    },
+    {
+      "studentId": "REEMPLAZAR",
+      "commitShas": ["REEMPLAZAR"],
+      "files": ["REEMPLAZAR"],
+      "tests": ["REEMPLAZAR"],
+      "reviews": [],
+      "prediction": "REEMPLAZAR",
+      "command": "REEMPLAZAR",
+      "observedResult": "REEMPLAZAR",
+      "explanation": "REEMPLAZAR"
+    }
+  ]
+}
