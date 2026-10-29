@@ -9,6 +9,7 @@ import type {
 import type { IncidentLocation } from '../campusops/contracts';
 import { reduceRefreshEvents, type RefreshSummary } from '../application/session/refreshState';
 import { deduplicateByOperationId, resolveSyncRecords } from '../application/sync/syncResolution';
+import { selectIncidentLocationFromProvider } from '../application/location/selectIncidentLocation';
 
 function pending(name: string): never {
   throw new Error(`${name} must be implemented in the assigned week`);
@@ -114,7 +115,8 @@ export function reducePermissionLifecycle(
   return pending('reducePermissionLifecycle');
 }
 
-/** Week 09: see docs/CAMPUSOPS_API.md; this is not a completed solution. */
-export function selectIncidentLocation(_provider: unknown, _manualLabel: string): IncidentLocation {
-  return pending('selectIncidentLocation');
+
+/** Week 09: see docs/CAMPUSOPS_API.md */
+export function selectIncidentLocation(provider: unknown, manualLabel: string): IncidentLocation {
+  return selectIncidentLocationFromProvider(provider, manualLabel);
 }
