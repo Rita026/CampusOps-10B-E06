@@ -35,14 +35,45 @@
     },
     {
       "studentId": "3523110572",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": ["REEMPLAZAR"],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "commitShas": [
+        "0776d6572c9d957900f4e013dd605bb98be3fd09",
+        "be72c73c4df3ba68cdd93116b7f1bd1b4cf68892",
+        "07df7596f282cb3272b92811fdc13821125cfee7"
+      ],
+      "files": [
+        "src/application/resilience/retryPolicy.ts",
+        "src/application/resilience/runWithRetry.ts",
+        "src/course-evaluation/index.ts",
+        "src/application/sync/IncidentSyncService.ts",
+        "src/application/incidents/IncidentClient.ts",
+        "src/infrastructure/incidents/CourseIncidentClient.ts",
+        "src/bootstrap/campusOpsServices.ts",
+        "course-tests/retryPolicy.test.ts",
+        "course-tests/lostResponse.integration.test.ts",
+        "docs/resilience-policy.md",
+        "docs/sync-policy.md",
+        "evidence/week-09/individual.json"
+      ],
+      "tests": [
+        "npm test -- --runInBand course-tests/public/week-09.test.ts",
+        "npm test -- --runInBand course-tests/retryPolicy.test.ts course-tests/lostResponse.integration.test.ts",
+        "npm test -- --runInBand course-tests/incidentSync.integration.test.ts",
+        "npm run typecheck",
+        "npm run lint",
+        "npm run test:smoke",
+        "npm run backend:self-test"
+      ],
+      "reviews": [
+        "Revisé que planRetry en src/course-evaluation/index.ts delegue en planRetryWithPolicy, la misma política que usa runWithRetry en la cola de sincronización; no hay una respuesta fija para la prueba pública.",
+        "Revisé contra el backend real (timeout_after_commit) que una resolución y un cierre cuya respuesta se pierde se reenvíen con la misma Idempotency-Key y el mismo cuerpo, que el servidor responda duplicate: true y que el historial tenga una sola entrada resolve/close. La misma clave con otra baseVersion recibe 409 y no se reintenta.",
+        "Revisé que las pruebas detecten regresiones: sin el límite de intentos fallaron 7 pruebas, ignorando Retry-After fallaron 6 y generando una clave nueva en cada reintento falló la prueba de resolución perdida (dos resolve en el historial); después restauré el código.",
+        "Encontré que Date.parse acepta '-1' y '1.5' como fechas; restringí Retry-After a segundos enteros o fecha HTTP (IMF-fixdate) para no convertir un valor inválido en una espera de 0 ms.",
+        "Usé asistencia de IA (Claude Code) en la implementación, las pruebas y la redacción; apliqué y revisé el código y la política, y verifiqué el resultado ejecutando las pruebas, typecheck, lint, smoke test y el self-test del backend."
+      ],
+      "prediction": "Esperaba que planRetry permitiera reintentar los intentos 1 a 3 y nunca desde el 4, que con 429 y retryAfterMs 800 devolviera delayMs 800, y que un POST 503 sin idempotencyKey devolviera retry false con requiresStableIdempotencyKey true. Contra el backend esperaba que una resolución guardada con la respuesta perdida se reenviara una sola vez con la misma clave y quedara un solo resolve en el historial, y que 429 o 500 persistentes se cortaran en 4 POST.",
+      "command": "npm test -- --runInBand course-tests/public/week-09.test.ts",
+      "observedResult": "PASS. Tests: 4 passed (antes de implementar fallaban los 3 de planRetry con 'planRetry must be implemented in the assigned week'). retryPolicy.test.ts 16/16 y lostResponse.integration.test.ts 5/5 en PASS: resolución perdida con intentos [timeout, ok], espera [500], 2 POST, confirmed con duplicate true, cola vacía y un solo resolve; cierre perdido igual con un solo close; 429 con Retry-After 1 → 4 POST, esperas [1000, 1000, 1000] y ninguna incidencia creada; 500 → 4 POST con esperas [500, 1000, 2000]; con reloj real pasó al menos 1 s antes del segundo intento. incidentSync.integration.test.ts 8/8 sigue en PASS. typecheck, lint, test:smoke y backend:self-test sin errores. En la suite completa sólo fallan week-10 a week-13, que llaman funciones de semanas futuras (igual en la rama base).",
+      "explanation": "Implementé planRetry como política en src/application/resilience/retryPolicy.ts: no se reintenta desde el intento 4 (maxAttempts configurable de 1 a 4), sólo se reintentan timeout, 408, 429 y 5xx, un Retry-After válido reemplaza la espera progresiva (500, 1000, 2000 ms) y uno mayor a 10 s se informa como fallo; un POST sólo se repite con una clave estable de al menos 8 caracteres. runWithRetry repite la misma función send, así que cada reintento manda la misma clave y el mismo cuerpo, y registra intentos con sólo tiempo y resultado. El cliente HTTP ahora entrega retryAfterMs desde la cabecera. Conecté la política a IncidentSyncService con una opción retry que reutiliza la operationId y el contenido persistidos en la cola de la semana 8, y la app la usa desde campusOpsServices. Documenté cuándo reintentar, cuándo usar la ubicación manual y cuándo informar el fallo en docs/resilience-policy.md."
     },
     {
       "studentId": "3523110600",
