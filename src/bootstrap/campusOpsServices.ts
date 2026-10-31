@@ -9,6 +9,7 @@ import { CourseSessionGateway } from '../infrastructure/session/CourseSessionGat
 import { SecureSessionCredentialStore } from '../infrastructure/session/SecureSessionCredentialStore';
 import { JsonPendingOperationStore } from '../infrastructure/sync/JsonPendingOperationStore';
 import { CourseBackendHealthGateway } from '../infrastructure/system/CourseBackendHealthGateway';
+import { logTelemetry } from '../infrastructure/telemetry/logTelemetry';
 
 /**
  * Composition root: the sole place that selects concrete infrastructure for
@@ -32,6 +33,8 @@ export const campusOpsServices = {
     queue: pendingOperations,
     client: incidentClient,
     currentActorId: () => session.getSnapshot().actor?.id ?? null,
+    // Default policy (docs/resilience-policy.md); only timing and outcome are logged.
+    retry: { onAttempt: (attempt) => logTelemetry('sync_retry_attempt', attempt) },
   }),
   checkBackendHealth: createBackendHealthCheck(new CourseBackendHealthGateway(backendUrl)),
   sessionCredentials,

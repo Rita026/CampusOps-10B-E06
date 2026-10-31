@@ -10,6 +10,7 @@ import {
   type IncidentActionInput,
   type IncidentActor,
 } from '../incidents/incidentAuthorization';
+import { classifyIncidentResult, runWithRetry, type RetryRunnerOptions } from '../resilience/runWithRetry';
 import { canonicalJson, deduplicateByOperationId, resolveSyncRecords } from './syncResolution';
 
 export type WorkAction = 'start' | 'resolve';
@@ -32,6 +33,11 @@ export type IncidentSyncServiceOptions = Readonly<{
   queue: PendingOperationQueuePort;
   client: IncidentActionClient;
   currentActorId: () => string | null;
+  /**
+   * Retries each send in place with planRetry, reusing the stored key and content.
+   * Without it a transient failure leaves the operation pending for the next pass.
+   */
+  retry?: RetryRunnerOptions;
 }>;
 
 function isWorkAction(action: string): action is WorkAction {
@@ -145,7 +151,11 @@ export class IncidentSyncService {
 
     const input = actionInput(toSend, action);
     if (input === null) return { kind: 'pending', operationId, reason: 'invalid_input' };
-    const result = await this.options.client.applyAction(operation.incidentId, input, operationId);
+    const send = () => this.options.client.applyAction(operation.incidentId, input, operationId);
+    const result = this.options.retry === undefined
+      ? await send()
+      : (await runWithRetry({ method: 'POST', idempotencyKey: operationId, send, classify: classifyIncidentResult },
+        this.options.retry)).result;
     if (!result.ok) {
       return result.error.kind === 'forbidden'
         ? { kind: 'conflict', operationId, fields: ['work'] }
