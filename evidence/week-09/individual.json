@@ -77,14 +77,32 @@
     },
     {
       "studentId": "3523110600",
-      "commitShas": ["REEMPLAZAR"],
-      "files": ["REEMPLAZAR"],
-      "tests": ["REEMPLAZAR"],
-      "reviews": [],
-      "prediction": "REEMPLAZAR",
-      "command": "REEMPLAZAR",
-      "observedResult": "REEMPLAZAR",
-      "explanation": "REEMPLAZAR"
+      "commitShas": [
+        "a98f35a4966d6a0f71fdee446cd3cf13a38f1628",
+        "61261f418b098cba7e509d7a294ed7ab2615639c"
+      ],
+      "files": [
+        "course-tests/geocodingGateway.test.ts",
+        "reports/week-09/fault-injection.json",
+        "reports/week-09/retry-metrics.json",
+        "evidence/week-09/engineering.json",
+        "evidence/week-09/individual.json"
+      ],
+      "tests": [
+        "npm.cmd test -- --runInBand course-tests/geocodingGateway.test.ts",
+        "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts",
+        "npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+        "npm.cmd test -- --runInBand course-tests/selectIncidentLocation.test.ts",
+        "npm.cmd test -- --runInBand course-tests/public/week-09.test.ts",
+        "npm.cmd run backend:self-test"
+      ],
+      "reviews": [
+        "Autorrevisión técnica: se revisó CourseGeocodingGateway.ts y se comprobó que las consultas inválidas se rechazan, los errores HTTP 429 se clasifican como rate_limited, los tiempos agotados como timeout y las desconexiones como network."
+      ],
+      "prediction": "Ante fallos temporales del servicio, las solicitudes deberán respetar el límite de reintentos y Retry-After. Las operaciones POST deberán utilizar una clave idempotente estable para evitar duplicados. Si el geocoding devuelve información inválida o incompleta, se deberá conservar la captura manual de ubicación.",
+      "command": "npm.cmd test -- --runInBand course-tests/geocodingGateway.test.ts; npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts; npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts; npm.cmd test -- --runInBand course-tests/selectIncidentLocation.test.ts; npm.cmd test -- --runInBand course-tests/public/week-09.test.ts; npm.cmd run backend:self-test",
+      "observedResult": "Las cinco suites automatizadas aprobaron 32 pruebas en total: 5 de fallos directos del adaptador de geocoding, 16 de política de reintentos, 5 de respuesta perdida e idempotencia, 2 de validación de ubicación y 4 pruebas públicas de Semana 09. La autoprueba del backend también terminó correctamente.",
+      "explanation": "Se probaron directamente los casos de consulta inválida, coordenadas fuera de rango, respuesta HTTP 429, timeout y desconexión en CourseGeocodingGateway. También se comprobaron los reintentos limitados, el backoff de 500, 1000 y 2000 ms, el respeto de Retry-After y la prevención de duplicados mediante claves idempotentes ante respuestas perdidas. La revisión registrada es una autorrevisión técnica, no una revisión de código realizada por otro integrante."
     }
   ]
 }
