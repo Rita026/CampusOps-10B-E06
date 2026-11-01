@@ -1,7 +1,7 @@
 ﻿{
     "schemaVersion":  1,
     "week":  9,
-    "commitSha":  "9e0e75b1efbfc4351c81e638526974ab665378b9",
+    "commitSha":  "a98f35a4966d6a0f71fdee446cd3cf13a38f1628",
     "generatedAt":  "2026-10-31T23:13:07.8983402-06:00",
     "checks":  [
                    {
@@ -38,6 +38,13 @@
                        "command":  "npm.cmd run backend:self-test",
                        "id":  "controlled-backend-contracts",
                        "evidence":  "El autodiagnóstico informó: roles, reassignment conflict, lost response, idempotency, evidence and geocoding PASS. Resultado final: Controlled backend self-test passed."
+                   },
+                   {
+                       "id":  "geocoding-adapter-direct-faults",
+                       "status":  "pass",
+                       "scenarioType":  "failure",
+                       "command":  "npm.cmd test -- --runInBand course-tests/geocodingGateway.test.ts",
+                       "evidence":  "PASS: 5/5 pruebas. Consulta vacía, coordenadas inválidas, HTTP 429, timeout y desconexión clasificados correctamente por CourseGeocodingGateway."
                    }
                ]
 }
