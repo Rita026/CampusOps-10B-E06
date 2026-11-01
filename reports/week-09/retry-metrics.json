@@ -1,0 +1,43 @@
+﻿{
+    "schemaVersion":  1,
+    "week":  9,
+    "commitSha":  "9e0e75b1efbfc4351c81e638526974ab665378b9",
+    "generatedAt":  "2026-10-31T23:13:07.8983402-06:00",
+    "checks":  [
+                   {
+                       "scenarioType":  "failure",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts",
+                       "id":  "bounded-exponential-backoff",
+                       "evidence":  "Suite aprobada 16/16. Backoff comprobado: 500 ms, 1000 ms y 2000 ms. El máximo es de cuatro intentos; desde el intento 4 no se programa otro reintento."
+                   },
+                   {
+                       "scenarioType":  "boundary",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts; npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+                       "id":  "retry-after-measurement",
+                       "evidence":  "Se comprobó el uso de Retry-After cuando es válido, el fallback cuando no lo es y el límite de 10 segundos. En la integración de respuesta perdida se registró una espera de 1000 ms y la prueba de reloj real confirmó al menos 1000 ms."
+                   },
+                   {
+                       "scenarioType":  "failure",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+                       "id":  "lost-response-attempts",
+                       "evidence":  "La resolución con respuesta perdida registró los intentos [[1,\u0027timeout\u0027,500],[2,\u0027ok\u0027,0]] y un retraso de [500] ms. Se reenviaron dos solicitudes POST con la misma clave y se conservó un solo evento de resolución."
+                   },
+                   {
+                       "scenarioType":  "failure",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+                       "id":  "persistent-server-error-limit",
+                       "evidence":  "La integración comprobó un error 500 persistente con cuatro solicitudes POST como máximo y retrasos progresivos de 500, 1000 y 2000 ms; después se registra el fallo final."
+                   },
+                   {
+                       "scenarioType":  "boundary",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts; npm.cmd test -- --runInBand course-tests/public/week-09.test.ts",
+                       "id":  "retry-safety-without-idempotency-key",
+                       "evidence":  "Las pruebas confirmaron que un POST sin identidad idempotente estable no se reintenta y que los errores finales 4xx no deben reintentarse."
+                   }
+               ]
+}

@@ -1,0 +1,43 @@
+﻿{
+    "schemaVersion":  1,
+    "week":  9,
+    "commitSha":  "9e0e75b1efbfc4351c81e638526974ab665378b9",
+    "generatedAt":  "2026-10-31T23:13:07.8983402-06:00",
+    "checks":  [
+                   {
+                       "scenarioType":  "boundary",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/selectIncidentLocation.test.ts; npm.cmd test -- --runInBand course-tests/public/week-09.test.ts",
+                       "id":  "geocoding-valid-and-manual-fallback",
+                       "evidence":  "Las pruebas confirmaron que se acepta una ubicación válida y que los datos nulos, incompletos o con coordenadas fuera de rango conservan la alternativa de captura manual. La suite selectIncidentLocation pasó 2/2 y la suite pública pasó 4/4."
+                   },
+                   {
+                       "scenarioType":  "failure",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+                       "id":  "lost-resolution-and-close-response",
+                       "evidence":  "Suite aprobada 5/5. Se comprobó la respuesta perdida después de guardar, el reenvío con la misma clave idempotente, la prevención de duplicados y el rechazo 409 cuando se reutiliza la clave con un cuerpo diferente."
+                   },
+                   {
+                       "scenarioType":  "failure",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts; npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+                       "id":  "rate-limited-retry",
+                       "evidence":  "Las pruebas comprobaron el tratamiento de 429, el respeto de Retry-After y el límite de cuatro intentos. La suite retryPolicy pasó 16/16 y la suite lostResponse.integration pasó 5/5."
+                   },
+                   {
+                       "scenarioType":  "failure",
+                       "status":  "pass",
+                       "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts",
+                       "id":  "timeout-and-network-retry-classification",
+                       "evidence":  "La suite aprobada 16/16 comprobó la clasificación de timeout y error de red como fallos reintentables dentro de la política. Esto verifica la política de reintentos, no una inyección individual de desconexión en CourseGeocodingGateway."
+                   },
+                   {
+                       "scenarioType":  "boundary",
+                       "status":  "pass",
+                       "command":  "npm.cmd run backend:self-test",
+                       "id":  "controlled-backend-contracts",
+                       "evidence":  "El autodiagnóstico informó: roles, reassignment conflict, lost response, idempotency, evidence and geocoding PASS. Resultado final: Controlled backend self-test passed."
+                   }
+               ]
+}
