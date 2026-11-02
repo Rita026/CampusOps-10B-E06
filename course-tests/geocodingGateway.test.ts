@@ -1,4 +1,4 @@
-﻿import { CourseGeocodingGateway } from '../src/infrastructure/location/CourseGeocodingGateway';
+import { CourseGeocodingGateway } from '../src/infrastructure/location/CourseGeocodingGateway';
 
 describe('CourseGeocodingGateway fault injection', () => {
   it('rejects an empty geocoding query without making an HTTP request', async () => {
