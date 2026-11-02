@@ -1,42 +1,46 @@
-﻿{
+{
     "schemaVersion":  1,
     "week":  9,
-    "commitSha":  "a98f35a4966d6a0f71fdee446cd3cf13a38f1628",
+    "commitSha":  "3d8c6d9567749eedb1fdf102fd0413e35d9c3dca",
     "decision":  "Aplicar reintentos acotados para operaciones idempotentes, con un máximo de cuatro intentos, backoff progresivo de 500, 1000 y 2000 ms y respeto de Retry-After dentro del límite de 10 segundos. Las escrituras POST requieren una clave de idempotencia estable para evitar duplicados cuando se pierde una respuesta.",
     "alternatives":  [
-                         "Reintentar indefinidamente hasta recibir una respuesta. Se descarta porque puede mantener solicitudes activas sin límite y aumentar la carga del servicio.",
-                         "No reintentar ninguna operación después de un error. Se descarta porque los fallos transitorios y las respuestas perdidas podrían dejar operaciones sin completar.",
-                         "Reintentar únicamente operaciones con identidad idempotente estable y detenerse al alcanzar el límite configurado. Es la alternativa seleccionada."
-                     ],
+      "Reintentar indefinidamente hasta recibir una respuesta. Se descarta porque puede mantener solicitudes activas sin límite y aumentar la carga del servicio.",
+      "No reintentar ninguna operación después de un error. Se descarta porque los fallos transitorios y las respuestas perdidas podrían dejar operaciones sin completar.",
+      "Reintentar únicamente operaciones con identidad idempotente estable y detenerse al alcanzar el límite configurado. Es la alternativa seleccionada."
+    ],
     "tradeoff":  "El límite de intentos evita ciclos indefinidos y reduce la carga sobre el servicio, pero una operación puede terminar reportándose como fallida aunque el servicio se recupere después. La clave idempotente permite repetir una escritura sin duplicar el efecto ya confirmado. Retry-After puede aumentar el tiempo de espera, pero respeta la indicación del servicio.",
     "requirementIds":  [
-
-                       ],
+       "AC-01",
+       "AC-02",
+       "AC-03",
+       "AC-04",
+       "AC-05"
+      ],
     "verification":  [
-                         {
-                             "evidence":  "Se verificaron el límite de intentos, backoff, Retry-After, clasificación de errores y requisito de clave estable para POST.",
-                             "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts",
-                             "result":  "PASS: 1 suite, 16 pruebas."
-                         },
-                         {
-                             "evidence":  "Se verificaron respuestas perdidas, reenvío idempotente, prevención de duplicados, 429 y 500 persistente.",
-                             "command":  "npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
-                             "result":  "PASS: 1 suite, 5 pruebas."
-                         },
-                         {
-                             "evidence":  "Se verificaron la aceptación de coordenadas válidas y la alternativa manual para datos inválidos o incompletos.",
-                             "command":  "npm.cmd test -- --runInBand course-tests/selectIncidentLocation.test.ts",
-                             "result":  "PASS: 1 suite, 2 pruebas."
-                         },
-                         {
-                             "evidence":  "Se verificaron geocoding válido y alternativa manual, respuesta perdida con clave estable, reintentos acotados y POST sin identidad idempotente.",
-                             "command":  "npm.cmd test -- --runInBand course-tests/public/week-09.test.ts",
-                             "result":  "PASS: 1 suite, 4 pruebas."
-                         },
-                         {
-                             "evidence":  "El backend confirmó los contratos de roles, conflicto de reasignación, respuesta perdida, idempotencia, evidencia y geocoding.",
-                             "command":  "npm.cmd run backend:self-test",
-                             "result":  "PASS: Controlled backend self-test passed."
-                         }
-                     ]
+        {
+            "evidence":  "Se verificaron el límite de intentos, backoff, Retry-After, clasificación de errores y requisito de clave estable para POST.",
+            "command":  "npm.cmd test -- --runInBand course-tests/retryPolicy.test.ts",
+            "result":  "PASS: 1 suite, 16 pruebas."
+        },
+        {
+            "evidence":  "Se verificaron respuestas perdidas, reenvío idempotente, prevención de duplicados, 429 y 500 persistente.",
+            "command":  "npm.cmd test -- --runInBand course-tests/lostResponse.integration.test.ts",
+            "result":  "PASS: 1 suite, 5 pruebas."
+        },
+        {
+            "evidence":  "Se verificaron la aceptación de coordenadas válidas y la alternativa manual para datos inválidos o incompletos.",
+            "command":  "npm.cmd test -- --runInBand course-tests/selectIncidentLocation.test.ts",
+            "result":  "PASS: 1 suite, 2 pruebas."
+        },
+        {
+            "evidence":  "Se verificaron geocoding válido y alternativa manual, respuesta perdida con clave estable, reintentos acotados y POST sin identidad idempotente.",
+            "command":  "npm.cmd test -- --runInBand course-tests/public/week-09.test.ts",
+            "result":  "PASS: 1 suite, 4 pruebas."
+        },
+        {
+            "evidence":  "El backend confirmó los contratos de roles, conflicto de reasignación, respuesta perdida, idempotencia, evidencia y geocoding.",
+            "command":  "npm.cmd run backend:self-test",
+            "result":  "PASS: Controlled backend self-test passed."
+        }
+    ]
 }
