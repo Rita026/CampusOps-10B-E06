@@ -14,6 +14,7 @@ import {
 } from '../../application/incidents/incidentAuthorization';
 import type { RequestCredentials, SessionAccess } from '../../application/session/SessionAccess';
 import type { IncidentCategory, IncidentStatus } from '../../campusops/contracts';
+import { parseRetryAfterMs } from '../../application/resilience/retryPolicy';
 import { parseRemoteResource } from '../../course-evaluation';
 import type { CloudIncident, IncidentDetails } from '../../domain/incidents/CloudIncident';
 import { logTelemetry } from '../telemetry/logTelemetry';
@@ -52,8 +53,15 @@ function ok<T>(value: T): IncidentClientResult<T> {
   return { ok: true, value };
 }
 
-function fail<T>(kind: IncidentClientErrorKind, status?: number): IncidentClientResult<T> {
-  return { ok: false, error: status === undefined ? { kind } : { kind, status } };
+function fail<T>(kind: IncidentClientErrorKind, status?: number, retryAfterMs?: number): IncidentClientResult<T> {
+  if (status === undefined) return { ok: false, error: { kind } };
+  return { ok: false, error: retryAfterMs === undefined ? { kind, status } : { kind, status, retryAfterMs } };
+}
+
+/** Some test transports build a minimal Response without headers. */
+function retryAfterOf(response: Response): number | undefined {
+  const headers = response.headers as Headers | undefined;
+  return typeof headers?.get === 'function' ? parseRetryAfterMs(headers.get('retry-after'), Date.now()) : undefined;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -313,7 +321,7 @@ export class CourseIncidentClient implements IncidentActionClient {
       } catch (error) {
         return fail(error instanceof Error && error.name === 'AbortError' ? 'timeout' : 'network');
       }
-      if (!response.ok) return fail(statusError(response.status), response.status);
+      if (!response.ok) return fail(statusError(response.status), response.status, retryAfterOf(response));
       try {
         return ok({ status: response.status, body: await response.json() as unknown });
       } catch {

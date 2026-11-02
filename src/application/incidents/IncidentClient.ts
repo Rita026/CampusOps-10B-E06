@@ -18,6 +18,8 @@ export type IncidentClientErrorKind =
 export type IncidentClientError = Readonly<{
   kind: IncidentClientErrorKind;
   status?: number;
+  /** Wait requested by the server with Retry-After (429/503), in milliseconds. */
+  retryAfterMs?: number;
 }>;
 
 export type IncidentClientResult<T> =
